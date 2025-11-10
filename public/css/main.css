@@ -511,9 +511,7 @@ h2 {
   margin-top: 2rem;
 }
 
-.ff-article-grid > .col {
-  display: flex;
-}
+/* Rimuoviamo override custom flex: lasciamo gestire a Bootstrap (row-cols-*) */
 
 .article-card {
   background: #ffffff;
@@ -735,11 +733,11 @@ h2 {
   background: var(--ff-primary);
   color: var(--ff-surface);
   border: none;
-  border-radius: 999px;
-  padding: 0.6rem 0.75rem;
+  border-radius: var(--ff-radius-sm); /* meno rotondo */
+  padding: 0.75rem 0.95rem; /* più grande */
   display: none;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   box-shadow: var(--ff-shadow-soft);
   transition: var(--ff-transition);
 }
@@ -801,6 +799,11 @@ h2 {
     display: flex;
   }
 
+  /* Spaziatura extra quando non c'è ff-main (home e indice capitolo) */
+  .col-content > main:not(.ff-main) { padding-top: 0.75rem; }
+  .col-content > main:not(.ff-main) .section-header,
+  .col-content > main:not(.ff-main) .chapter-header { margin-top: 0.5rem; }
+
   .section-header {
     align-items: flex-start;
     flex-direction: column;
@@ -814,6 +817,10 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Mobile-only utility per sezione navigazione primaria nel sidebar */
+.mobile-only { display: none; }
+@media (max-width: 1024px) { .mobile-only { display: block; } }
 
 @media (max-width: 600px) {
   .ff-hero {

@@ -42,6 +42,16 @@
                 <div class="col-12 col-lg-4 col-xl-4 col-sidebar">
                     <aside class="ff-sidebar" :class="{ 'ff-sidebar--open': sidebarOpen }">
                         <div class="ff-sidebar__inner">
+                            <!-- Navigazione primaria (solo mobile) -->
+                            <section class="ff-sidebar__section mobile-only">
+                                <p class="ff-sidebar__label">Navigazione</p>
+                                <nav class="ff-sidebar__nav">
+                                    <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
+                                    </NuxtLink>
+                                    <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
+                                        di FFStory</NuxtLink>
+                                </nav>
+                            </section>
                             <section v-if="isChapterRoute && chapterArticles.length" class="ff-sidebar__section">
                                 <p class="ff-sidebar__label">Articoli del capitolo</p>
                                 <nav class="ff-sidebar__nav ff-sidebar__nav--sub">
