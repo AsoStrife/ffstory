@@ -1,23 +1,30 @@
 {
-    "name": "nuxt-app",
-    "type": "module",
-    "private": true,
-    "scripts": {
-        "build": "nuxt build",
-        "dev": "nuxt dev",
-        "generate": "nuxt generate",
-        "preview": "nuxt preview",
-        "postinstall": "nuxt prepare"
-    },
-    "dependencies": {
-        "@nuxt/content": "^3.8.0",
-        "@nuxt/image": "^2.0.0",
-        "@popperjs/core": "^2.11.8",
-        "axios": "^1.13.2",
-        "better-sqlite3": "^12.4.1",
-        "bootstrap": "^5.3.8",
-        "nuxt": "^4.2.1",
-        "vue": "^3.5.22",
-        "vue-router": "^4.6.3"
-    }
+  "name": "nuxt-app",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/content": "^3.8.0",
+    "@nuxt/image": "^2.0.0",
+    "@popperjs/core": "^2.11.8",
+    "axios": "^1.13.2",
+    "better-sqlite3": "^12.4.1",
+    "bootstrap": "^5.3.8",
+    "highlight.js": "^11.10.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^8.6.7",
+    "markdown-it-attrs": "^4.3.1",
+    "markdown-it-emoji": "^3.0.0",
+    "markdown-it-footnote": "^3.0.3",
+    "markdown-it-task-lists": "^2.1.1",
+    "nuxt": "^4.2.1",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
+  }
 }

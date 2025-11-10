@@ -27,14 +27,19 @@ html {
   min-height: 100%;
 }
 
+/* Import modern UI font (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
 body {
-  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--ff-bg);
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: var(--ff-text);
   min-height: 100vh;
-  line-height: 1.6;
+  line-height: 1.55;
+  font-size: 15px; /* slightly smaller base size */
+  font-weight: 600; /* stronger weight by default for a bolder look */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -45,6 +50,7 @@ a {
 p {
   color: var(--ff-muted);
   margin-bottom: 1rem;
+  font-weight: 400; /* keep paragraphs readable */
 }
 
 h1,
@@ -241,6 +247,129 @@ h2 {
 
 .ff-main > *:first-child {
   margin-top: 0;
+}
+
+/* Variante senza macroscheda (homepage & indice capitolo) */
+.col-content > main:not(.ff-main) {
+  /* rimuove card bianca lasciando solo il contenuto grezzo */
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  min-height: auto;
+  backdrop-filter: none;
+}
+
+/* Top horizontal navigation - visually similar to sidebar links */
+.ff-topnav {
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
+}
+.ff-topnav__inner {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+.ff-topnav__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--ff-radius-sm);
+  color: var(--ff-muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--ff-transition);
+  border: 1px solid transparent;
+}
+.ff-topnav__link:hover {
+  background: var(--ff-primary-soft);
+  color: var(--ff-primary);
+  border-color: rgba(52, 81, 178, 0.12);
+}
+.ff-topnav__link--active {
+  background: var(--ff-primary);
+  color: var(--ff-surface);
+  box-shadow: 0 14px 30px rgba(52, 81, 178, 0.12);
+}
+
+/* Hide hero header on small screens */
+@media (max-width: 767px) {
+  .ff-hero {
+    display: none;
+  }
+  /* ensure topnav remains visible and usable on mobile */
+  .ff-topnav {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Attached variant: appears as the continuation of the hero visual */
+.ff-topnav--attached {
+  position: relative;
+  margin-top: -1.6rem; /* smaller overlap to better align with image */
+  padding: 0.6rem 0.8rem;
+  /* align bottom radii with hero visual but keep top corners flush */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: calc(var(--ff-radius-lg) / 1.6);
+  border-bottom-right-radius: calc(var(--ff-radius-lg) / 1.6);
+  /* more subtle background and almost invisible border to blend with image */
+  background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.86));
+  box-shadow: 0 8px 22px rgba(32,41,77,0.05);
+  backdrop-filter: blur(6px);
+  border: 0.6px solid rgba(223,227,244,0.45);
+}
+.ff-topnav--attached .ff-topnav__inner {
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+/* Edge variant: minimal, hugs the bottom edge of the image */
+.ff-topnav--edge {
+  position: relative;
+  margin-top: -1.15rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.45);
+  backdrop-filter: blur(6px);
+  display: inline-block;
+}
+
+/* Make sure topnav remains visible on mobile even if hero is hidden */
+@media (max-width: 767px) {
+  .ff-topnav--attached,
+  .ff-topnav--edge {
+    margin-top: 0.5rem;
+    position: static;
+    padding: 0.5rem 0.5rem;
+    border-radius: var(--ff-radius-sm);
+    background: var(--ff-surface);
+  }
+}
+
+/* Article body: justify text for better reading flow */
+.article-body,
+.article-body p {
+  text-align: justify;
+  text-justify: inter-word;
+  font-weight: 400; /* ensure article paragraphs are regular weight */
+}
+
+/* Footer */
+.ff-footer {
+  margin-top: 2.25rem;
+  padding: 0.9rem 0;
+  color: var(--ff-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.ff-footer__text a {
+  color: var(--ff-primary);
+  text-decoration: none;
+}
+.ff-footer__text a:hover {
+  color: var(--ff-accent);
 }
 
 .homepage {

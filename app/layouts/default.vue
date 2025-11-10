@@ -8,6 +8,14 @@
                             <img src="/img/header.jpg" alt="Panoramica Final Fantasy" loading="lazy" />
 
                         </div>
+                        <!-- Attached topnav: appears as continuation of the hero image -->
+                        <nav class="ff-topnav ff-topnav--attached">
+                            <div class="ff-topnav__inner">
+                                <NuxtLink to="/" class="ff-topnav__link" :class="{ 'ff-topnav__link--active': isHome }">
+                                    Home</NuxtLink>
+                                <NuxtLink to="/storia" class="ff-topnav__link">Storia di FFStory</NuxtLink>
+                            </div>
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -20,10 +28,13 @@
             <span></span>
         </button>
 
+        <!-- Top horizontal navigation moved into header to visually connect with hero -->
+
         <div class="container-xl">
             <div class="row gx-lg-5 gy-4 align-items-start">
                 <div class="col-12 col-lg-8 col-xl-8 col-content">
-                    <main class="ff-main">
+                    <!-- Condizionale: rimuove la macroscheda bianca su homepage e lista capitolo -->
+                    <main :class="mainClass">
                         <slot />
                     </main>
                 </div>
@@ -47,10 +58,7 @@
                             <section class="ff-sidebar__section">
                                 <p class="ff-sidebar__label">Capitoli</p>
                                 <nav class="ff-sidebar__nav">
-                                    <NuxtLink to="/" class="ff-sidebar__link"
-                                        :class="{ 'ff-sidebar__link--active': isHome }" @click="closeSidebarOnMobile">
-                                        Home
-                                    </NuxtLink>
+                                    <!-- Home link removed as requested -->
                                     <NuxtLink v-for="chapter in chapters" :key="chapter.id"
                                         :to="`/capitolo/${chapter.attributes.titleUrl}`" class="ff-sidebar__link"
                                         :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.titleUrl) }"
@@ -64,6 +72,13 @@
                 </div>
             </div>
         </div>
+        <!-- small site footer -->
+        <footer class="ff-footer">
+            <div class="container-xl">
+                <p class="ff-footer__text">FFStory 2009 - {{ currentYear }} - <a href="https://strifelab.com"
+                        target="_blank" rel="noopener noreferrer">Made by Strifelab</a></p>
+            </div>
+        </footer>
     </div>
 </template>
 
@@ -134,4 +149,15 @@ const closeSidebarOnMobile = () => {
         sidebarOpen.value = false
     }
 }
+
+const currentYear = new Date().getFullYear()
+
+// Rimuove il background bianco (ff-main) per homepage e pagina indice capitolo
+const mainClass = computed(() => {
+    // homepage
+    if (route.path === '/') return ''
+    // pagina lista articoli capitolo (/capitolo/:slug)
+    if (isChapterRoute.value && !activeArticleSlug.value) return ''
+    return 'ff-main'
+})
 </script>

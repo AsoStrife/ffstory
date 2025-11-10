@@ -92,14 +92,55 @@ const buildAbsoluteUrl = (path?: string | null) => {
 }
 
 export const useStrapi = () => {
+    const CACHE_KEY = 'ffstory_chapters_cache'
+    const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 giorni in millisecondi
+
     const fetchChapters = async () => {
+        // Verifica se siamo nel browser
+        if (typeof window === 'undefined') {
+            // Server-side: nessun caching, fetch diretto
+            try {
+                const { data } = await http.get<StrapiResponse<StrapiEntity<Chapter>[]>>('/chapters', {
+                    params: {
+                        sort: 'sort'
+                    }
+                })
+                return data.data
+            } catch (error) {
+                console.error('Error fetching chapters:', error)
+                return []
+            }
+        }
+
+        // Client-side: usa cache localStorage
         try {
+            const cached = localStorage.getItem(CACHE_KEY)
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached)
+                const now = Date.now()
+                
+                // Se la cache è ancora valida (meno di 7 giorni), ritornala
+                if (now - timestamp < CACHE_DURATION) {
+                    console.log('Using cached chapters data')
+                    return data
+                }
+            }
+
+            // Cache non trovata o scaduta: fetch da API
             const { data } = await http.get<StrapiResponse<StrapiEntity<Chapter>[]>>('/chapters', {
                 params: {
-                    sort: 'publishedAt:desc'
+                    sort: 'sort'
                 }
             })
-            return data.data ?? []
+            
+            // Salva in cache
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                data: data.data,
+                timestamp: Date.now()
+            }))
+            
+            console.log('Chapters data fetched and cached')
+            return data.data
         } catch (error) {
             console.error('Error fetching chapters:', error)
             return []

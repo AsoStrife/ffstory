@@ -28,7 +28,7 @@
             </span>
         </div>
 
-        <div class="article-body" v-html="article.attributes.body"></div>
+        <div class="article-body" v-html="renderedBody"></div>
 
         <div class="article-footer">
             <NuxtLink :to="`/capitolo/${chapterSlug}`" class="ff-button ff-button--ghost">
@@ -43,9 +43,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../../../composables/useStrapi'
+import { useMarkdown } from '../../../composables/useMarkdown'
 
 const route = useRoute()
 const { fetchArticleBySlug, getMediaUrl } = useStrapi()
+const { renderMarkdown } = useMarkdown()
 
 const chapterSlug = route.params.slug as string
 const articleSlug = route.params.article as string
@@ -53,6 +55,11 @@ const articleSlug = route.params.article as string
 const article = ref<StrapiEntity<Article> | null>(null)
 const pending = ref(true)
 const error = ref(false)
+
+const renderedBody = computed(() => {
+    if (!article.value) return ''
+    return renderMarkdown(article.value.attributes.body || '')
+})
 
 const coverUrl = computed(() => {
     if (!article.value) {
