@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../../../composables/useStrapi'
@@ -95,6 +95,42 @@ onMounted(async () => {
     }
 })
 
+// When the rendered HTML changes, ensure tables get Bootstrap-like markup
+const processTables = () => {
+    const container = document.querySelector('.article-body')
+    if (!container) return
+
+    const tables = Array.from(container.querySelectorAll('table'))
+    tables.forEach((table) => {
+        // Skip if already processed
+        if (table.classList.contains('table')) return
+
+        // Add Bootstrap table classes
+        table.classList.add('table', 'table-striped', 'table-hover')
+
+        // If already wrapped, skip wrapping
+        const parent = table.parentElement
+        if (parent && parent.classList.contains('table-responsive')) return
+
+        // Wrap the table in a div.table-responsive
+        const wrapper = document.createElement('div')
+        wrapper.className = 'table-responsive'
+        parent?.insertBefore(wrapper, table)
+        wrapper.appendChild(table)
+    })
+}
+
+// Watch for changes to the rendered HTML and run processing after DOM update
+watch(renderedBody, async () => {
+    await nextTick()
+    try {
+        processTables()
+    } catch (e) {
+        // non-blocking
+        console.error('Error processing tables:', e)
+    }
+})
+
 useHead(() => ({
     title: article.value ? `${article.value.attributes.title} - FFStory` : 'Articolo - FFStory',
     meta: [
@@ -133,5 +169,40 @@ useHead(() => ({
 
 .article-footer {
     margin-top: 2.5rem;
+}
+
+/* Fallback table styles to mimic Bootstrap's table look when Bootstrap isn't loaded.
+   Use deep selector so styles apply to HTML inserted via v-html even with scoped styles. */
+:deep(.table-responsive) {
+    width: 100%;
+    overflow-x: auto;
+}
+
+:deep(table.table) {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: inherit;
+    border-collapse: collapse;
+}
+
+:deep(table.table th),
+:deep(table.table td) {
+    padding: 0.75rem;
+    vertical-align: top;
+    border: 1px solid var(--ff-border);
+}
+
+:deep(table.table thead th) {
+    vertical-align: bottom;
+    background-color: rgba(0, 0, 0, 0.03);
+    font-weight: 600;
+}
+
+:deep(table.table.table-striped tbody tr:nth-of-type(odd)) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+:deep(table.table.table-hover tbody tr:hover) {
+    background-color: rgba(0, 0, 0, 0.04);
 }
 </style>
