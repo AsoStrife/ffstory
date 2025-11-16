@@ -13,7 +13,11 @@
                             <div class="ff-topnav__inner">
                                 <NuxtLink to="/" class="ff-topnav__link" :class="{ 'ff-topnav__link--active': isHome }">
                                     Home</NuxtLink>
-                                <NuxtLink to="/storia" class="ff-topnav__link">Storia di FFStory</NuxtLink>
+                                <NuxtLink to="/storia" class="ff-topnav__link"
+                                    :class="{ 'ff-topnav__link--active': isStoria }">Storia di FFStory</NuxtLink>
+                                <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-topnav__link"
+                                    :class="{ 'ff-topnav__link--active': isTraduttore }">
+                                    Traduttore Albhed</NuxtLink>
                             </div>
                         </nav>
                     </div>
@@ -50,6 +54,8 @@
                                     </NuxtLink>
                                     <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
+                                    <NuxtLink to="/traduttore-albhed" class="ff-sidebar__link"
+                                        @click="closeSidebarOnMobile">Traduttore Al Bhed</NuxtLink>
                                 </nav>
                             </section>
                             <section v-if="isChapterRoute && chapterArticles.length" class="ff-sidebar__section">
@@ -105,6 +111,8 @@ const route = useRoute()
 const chapterArticles = ref<StrapiEntity<Article>[]>([])
 
 const isHome = computed(() => route.path === '/')
+const isStoria = computed(() => route.path === '/storia')
+const isTraduttore = computed(() => route.path === '/capitolo/final-fantasy-x/traduttore-albhed')
 
 const activeChapterSlug = computed(() => {
     const rawSlug = route.params.slug
@@ -137,7 +145,11 @@ watch(
         }
 
         try {
-            chapterArticles.value = await fetchArticles(slug, { limit: 50 })
+            const articles = await fetchArticles(slug, { limit: 50 })
+            // Ordina gli articoli alfabeticamente per titolo
+            chapterArticles.value = articles.sort((a, b) =>
+                a.attributes.title.localeCompare(b.attributes.title, 'it')
+            )
         } catch (error) {
             console.error('Error loading chapter articles:', error)
             chapterArticles.value = []
@@ -168,6 +180,8 @@ const mainClass = computed(() => {
     if (route.path === '/') return ''
     // pagina lista articoli capitolo (/capitolo/:slug)
     if (isChapterRoute.value && !activeArticleSlug.value) return ''
+    // pagina traduttore albhed
+    if (route.path === '/capitolo/final-fantasy-x/traduttore-albhed') return ''
     return 'ff-main'
 })
 </script>

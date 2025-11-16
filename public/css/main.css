@@ -166,7 +166,6 @@ h2 {
 
 .ff-sidebar__section + .ff-sidebar__section {
   padding-top: 1.5rem;
-  border-top: 1px solid var(--ff-border);
 }
 
 .ff-sidebar__label {
@@ -286,9 +285,9 @@ h2 {
   border-color: rgba(52, 81, 178, 0.12);
 }
 .ff-topnav__link--active {
-  background: var(--ff-primary);
-  color: var(--ff-surface);
-  box-shadow: 0 14px 30px rgba(52, 81, 178, 0.12);
+  background: var(--ff-primary-soft);
+  color: var(--ff-primary);
+  border-color: rgba(52, 81, 178, 0.12);
 }
 
 /* Hide hero header on small screens */
