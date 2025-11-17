@@ -8,7 +8,7 @@ export default defineNuxtConfig({
         'bootstrap/dist/css/bootstrap.min.css'
     ],
 
-    modules: ['@nuxt/content', '@nuxt/image'],
+    modules: ['@nuxt/image'],
 
     app: {
         head: {
