@@ -5,8 +5,8 @@
         <section class="homepage-latest">
             <div class="section-header">
                 <div>
-                    <p class="section-eyebrow">Aggiornamenti freschi</p>
-                    <h2>Ultime storie pubblicate</h2>
+                    <p class="section-eyebrow">Final Fantasy Story</p>
+                    <h2>Ultimi articoli pubblicati</h2>
                 </div>
                 <NuxtLink v-if="primaryChapterLink" :to="primaryChapterLink" class="section-link">
                     Tutti i capitoli →

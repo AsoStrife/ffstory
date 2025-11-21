@@ -54,7 +54,7 @@
                                     </NuxtLink>
                                     <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
-                                    <NuxtLink to="/traduttore-albhed" class="ff-sidebar__link"
+                                    <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
                                         @click="closeSidebarOnMobile">Traduttore Al Bhed</NuxtLink>
                                 </nav>
                             </section>
