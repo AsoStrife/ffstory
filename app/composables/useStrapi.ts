@@ -71,6 +71,10 @@ interface FetchArticlesOptions {
     limit?: number
 }
 
+interface FetchArticlesPagedOptions extends FetchArticlesOptions {
+    start?: number
+}
+
 const http = axios.create({
     baseURL: STRAPI_BASE_URL,
     timeout: 10000,
@@ -170,6 +174,31 @@ export const useStrapi = () => {
         }
     }
 
+    // Variante che ritorna anche la meta di paginazione senza alterare la funzione esistente
+    const fetchArticlesPaged = async (chapterTitleUrl?: string, options: FetchArticlesPagedOptions = {}) => {
+        try {
+            const params: Record<string, string | number | undefined> = {
+                populate: 'cover,chapter',
+                sort: 'publishedAt:desc',
+                'pagination[limit]': options.limit,
+                'pagination[start]': options.start
+            }
+
+            if (chapterTitleUrl) {
+                params['filters[chapter][titleUrl][$eq]'] = chapterTitleUrl
+            }
+
+            const { data } = await http.get<StrapiResponse<StrapiEntity<Article>[]>>('/articles', {
+                params
+            })
+            // Ritorniamo l'intero payload così da poter usare meta.pagination
+            return data
+        } catch (error) {
+            console.error('Error fetching paged articles:', error)
+            return { data: [], meta: { pagination: { start: 0, limit: options.limit || 0, total: 0 } } } as any
+        }
+    }
+
     const fetchArticleBySlug = async (slug: string) => {
         try {
             const { data } = await http.get<StrapiResponse<StrapiEntity<Article>[]>>('/articles', {
@@ -203,6 +232,7 @@ export const useStrapi = () => {
     return {
         fetchChapters,
         fetchArticles,
+        fetchArticlesPaged,
         fetchArticleBySlug,
         getMediaUrl
     }

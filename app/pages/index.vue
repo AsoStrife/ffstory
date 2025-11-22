@@ -42,6 +42,11 @@
                 </div>
             </div>
 
+            <div v-if="latestArticlesList.length" class="pagination-controls">
+                <button class="ff-button ff-button--ghost pager-btn" :disabled="!canGoPrev" @click="goPrev">← Precedenti</button>
+                <button class="ff-button btn-outline-primary pager-btn" :disabled="!canGoNext" @click="goNext">Prossimi →</button>
+            </div>
+
             <div v-else class="alert alert-info">
                 Non ci sono articoli pubblicati al momento. Torna presto per nuovi contenuti!
             </div>
@@ -51,22 +56,46 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useAsyncData, useHead } from 'nuxt/app'
+import { computed, ref } from 'vue'
+import { useAsyncData, useHead, useRoute, useRouter } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../composables/useStrapi'
 
-const { fetchArticles, getMediaUrl } = useStrapi()
+const { fetchArticlesPaged, getMediaUrl } = useStrapi()
+
+const route = useRoute()
+const router = useRouter()
+const LIMIT = 6
+const page = ref(Number(route.query.page) > 0 ? Number(route.query.page) : 1)
 
 // @ts-ignore -- top-level await is allowed in Nuxt 3 setup scripts
-const { data: latestArticles, pending: articlesPending, error: articlesError } = await useAsyncData<StrapiEntity<Article>[]>(
-    'homepage-latest-articles',
-    () => fetchArticles(undefined, { limit: 6 }),
+const { data: latestArticlesResponse, pending: articlesPending, error: articlesError } = await useAsyncData(
+    () => `homepage-latest-articles-page-${page.value}`,
+    () => fetchArticlesPaged(undefined, { limit: LIMIT, start: (page.value - 1) * LIMIT }),
     {
-        default: () => []
+        default: () => ({ data: [], meta: { pagination: { start: 0, limit: LIMIT, total: 0 } } }),
+        watch: [page]
     }
 )
 
-const latestArticlesList = computed(() => latestArticles.value ?? [])
+const latestArticlesList = computed<StrapiEntity<Article>[]>(() => latestArticlesResponse.value?.data ?? [])
+const pagination = computed(() => (latestArticlesResponse.value as any)?.meta?.pagination || { start: 0, limit: LIMIT, total: 0 })
+
+const canGoPrev = computed(() => page.value > 1)
+const canGoNext = computed(() => (pagination.value.start + pagination.value.limit) < pagination.value.total)
+
+const goPrev = () => {
+    if (!canGoPrev.value) return
+    const newPage = page.value - 1
+    page.value = newPage
+    router.push({ query: { ...route.query, page: newPage === 1 ? undefined : newPage } })
+}
+
+const goNext = () => {
+    if (!canGoNext.value) return
+    const newPage = page.value + 1
+    page.value = newPage
+    router.push({ query: { ...route.query, page: newPage } })
+}
 
 const primaryChapterLink = computed(() => {
     const first = latestArticlesList.value.find((article) =>
@@ -106,3 +135,23 @@ useHead({
     ]
 })
 </script>
+
+<style scoped>
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.pager-btn {
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.pager-btn[disabled] {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+</style>
