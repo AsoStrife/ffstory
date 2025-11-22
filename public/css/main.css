@@ -685,6 +685,27 @@ h2 {
   margin-bottom: 1.5rem;
 }
 
+/* Elenchi puntati e numerati negli articoli: uniformiamo colore al testo dei paragrafi */
+.article-body ul,
+.article-body ol,
+.article-body li {
+  color: var(--ff-muted);
+  font-weight: 400;
+}
+
+/* Spaziatura e indentazione gentile per liste */
+.article-body ul,
+.article-body ol {
+  margin: 0 0 1.5rem 1.3rem;
+  padding-left: 0.2rem; /* leggero offset senza eccessivo rientro */
+}
+
+/* Colore marcatori (browser moderni) */
+.article-body ul li::marker,
+.article-body ol li::marker {
+  color: var(--ff-muted);
+}
+
 .article-body a {
   color: var(--ff-primary);
   text-decoration: underline;

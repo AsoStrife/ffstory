@@ -43,8 +43,10 @@
             </div>
 
             <div v-if="latestArticlesList.length" class="pagination-controls">
-                <button class="ff-button ff-button--ghost pager-btn" :disabled="!canGoPrev" @click="goPrev">← Precedenti</button>
-                <button class="ff-button btn-outline-primary pager-btn" :disabled="!canGoNext" @click="goNext">Prossimi →</button>
+                <button class="ff-button ff-button--ghost pager-btn" :disabled="!canGoPrev" @click="goPrev">←
+                    Precedenti</button>
+                <button class="ff-button btn-outline-primary pager-btn" :disabled="!canGoNext" @click="goNext">Prossimi
+                    →</button>
             </div>
 
             <div v-else class="alert alert-info">
@@ -55,84 +57,165 @@
     </div>
 </template>
 
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useAsyncData, useHead, useRoute, useRouter } from 'nuxt/app'
+<script lang="ts">
+// Abbiamo sostituito useAsyncData con un fetch manuale per semplificare l'integrazione nell'Options API.
+
+import { defineComponent } from 'vue'
+import { useRoute, useRouter } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../composables/useStrapi'
 
-const { fetchArticlesPaged, getMediaUrl } = useStrapi()
-
-const route = useRoute()
-const router = useRouter()
-const LIMIT = 6
-const page = ref(Number(route.query.page) > 0 ? Number(route.query.page) : 1)
-
-// @ts-ignore -- top-level await is allowed in Nuxt 3 setup scripts
-const { data: latestArticlesResponse, pending: articlesPending, error: articlesError } = await useAsyncData(
-    () => `homepage-latest-articles-page-${page.value}`,
-    () => fetchArticlesPaged(undefined, { limit: LIMIT, start: (page.value - 1) * LIMIT }),
-    {
-        default: () => ({ data: [], meta: { pagination: { start: 0, limit: LIMIT, total: 0 } } }),
-        watch: [page]
-    }
-)
-
-const latestArticlesList = computed<StrapiEntity<Article>[]>(() => latestArticlesResponse.value?.data ?? [])
-const pagination = computed(() => (latestArticlesResponse.value as any)?.meta?.pagination || { start: 0, limit: LIMIT, total: 0 })
-
-const canGoPrev = computed(() => page.value > 1)
-const canGoNext = computed(() => (pagination.value.start + pagination.value.limit) < pagination.value.total)
-
-const goPrev = () => {
-    if (!canGoPrev.value) return
-    const newPage = page.value - 1
-    page.value = newPage
-    router.push({ query: { ...route.query, page: newPage === 1 ? undefined : newPage } })
+// Tipi di supporto per chiarezza
+interface PaginationMeta {
+    start: number
+    limit: number
+    total: number
+}
+interface ArticlesResponse {
+    data: StrapiEntity<Article>[]
+    meta: { pagination: PaginationMeta }
 }
 
-const goNext = () => {
-    if (!canGoNext.value) return
-    const newPage = page.value + 1
-    page.value = newPage
-    router.push({ query: { ...route.query, page: newPage } })
-}
+export default defineComponent({
+    name: 'HomePage',
 
-const primaryChapterLink = computed(() => {
-    const first = latestArticlesList.value.find((article) =>
-        Boolean(article.attributes.chapter?.data?.attributes?.titleUrl)
-    )
-
-    const chapterSlug = first?.attributes.chapter?.data?.attributes?.titleUrl
-
-    return chapterSlug ? `/capitolo/${chapterSlug}` : null
-})
-
-const articleLink = (article: StrapiEntity<Article>) => {
-    const chapterSlug = article.attributes.chapter?.data?.attributes?.titleUrl
-    return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.titleUrl}` : `/capitolo/${article.attributes.titleUrl}`
-}
-
-const coverFor = (article: StrapiEntity<Article>) => {
-    return getMediaUrl(article.attributes.cover, 'medium') || '/img/header.jpg'
-}
-
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('it-IT', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    })
-}
-
-useHead({
-    title: 'FFStory - Final Fantasy in chiave moderna',
-    meta: [
-        {
-            name: 'description',
-            content: 'Un hub moderno per guide, storie e curiosità dedicate alla saga di Final Fantasy.'
+    // HEAD: definizione dei metadati della pagina (equivalente a useHead nel setup)
+    head() {
+        return {
+            title: 'FFStory - Tutto sulla saga di Final Fantasy',
+            meta: [
+                {
+                    name: 'description',
+                    content: 'Un hub moderno per guide, storie e curiosità dedicate alla saga di Final Fantasy.'
+                }
+            ]
         }
-    ]
+    },
+
+    // DATA: stato reattivo di base della pagina
+    data() {
+        const route = useRoute() // Recupero query param per pagina corrente
+        return {
+            LIMIT: 6, // Numero articoli per pagina
+            page: Number(route.query.page) > 0 ? Number(route.query.page) : 1, // Pagina attuale (fallback a 1)
+            latestArticlesResponse: {
+                data: [],
+                meta: { pagination: { start: 0, limit: 6, total: 0 } }
+            } as ArticlesResponse, // Struttura risposta articoli
+            articlesPending: true, // Stato di caricamento
+            articlesError: null as Error | null, // Eventuale errore nel fetch
+            route // Mantengo riferimento alla route per aggiornare i query params
+        }
+    },
+
+    // COMPUTED: derivazioni dello stato principale
+    computed: {
+        // Lista degli articoli più recenti
+        latestArticlesList(): StrapiEntity<Article>[] {
+            return this.latestArticlesResponse?.data || []
+        },
+        // Dati di paginazione
+        pagination(): PaginationMeta {
+            return (this.latestArticlesResponse?.meta?.pagination) || { start: 0, limit: this.LIMIT, total: 0 }
+        },
+        // Se posso andare alla pagina precedente
+        canGoPrev(): boolean {
+            return this.page > 1
+        },
+        // Se posso andare alla pagina successiva
+        canGoNext(): boolean {
+            return (this.pagination.start + this.pagination.limit) < this.pagination.total
+        },
+        // Link al capitolo primario (primo articolo con capitolo associato)
+        primaryChapterLink(): string | null {
+            const first = this.latestArticlesList.find(article => Boolean(article.attributes.chapter?.data?.attributes?.titleUrl))
+            const chapterSlug = first?.attributes.chapter?.data?.attributes?.titleUrl
+            return chapterSlug ? `/capitolo/${chapterSlug}` : null
+        }
+    },
+
+    // WATCH: quando cambia la pagina rifaccio il fetch
+    watch: {
+        page() {
+            this.fetchArticles()
+        }
+    },
+
+    // METODI: azioni della pagina
+    methods: {
+        // Recupera funzioni Strapi (richiede composable, chiamato una volta)
+        getStrapiHelpers() {
+            // Commento: centralizziamo l'accesso per eventuale estensione futura
+            return useStrapi()
+        },
+        // Esegue il fetch degli articoli con paginazione
+        async fetchArticles() {
+            const { fetchArticlesPaged } = this.getStrapiHelpers()
+            this.articlesPending = true
+            this.articlesError = null
+            try {
+                // Calcolo offset di partenza
+                const start = (this.page - 1) * this.LIMIT
+                // Chiamata API
+                const response = await fetchArticlesPaged(undefined, { limit: this.LIMIT, start })
+                // Normalizzo risposta
+                this.latestArticlesResponse = (response as ArticlesResponse) || {
+                    data: [],
+                    meta: { pagination: { start, limit: this.LIMIT, total: 0 } }
+                }
+            } catch (err: any) {
+                this.articlesError = err
+                // Fallback struttura vuota
+                this.latestArticlesResponse = {
+                    data: [],
+                    meta: { pagination: { start: 0, limit: this.LIMIT, total: 0 } }
+                }
+            } finally {
+                this.articlesPending = false
+            }
+        },
+        // Vai alla pagina precedente
+        goPrev() {
+            if (!this.canGoPrev) return
+            const newPage = this.page - 1
+            this.page = newPage
+            const router = useRouter()
+            // Se torno a pagina 1 rimuovo il parametro per URL pulito
+            router.push({ query: { ...this.route.query, page: newPage === 1 ? undefined : newPage } })
+        },
+        // Vai alla pagina successiva
+        goNext() {
+            if (!this.canGoNext) return
+            const newPage = this.page + 1
+            this.page = newPage
+            const router = useRouter()
+            router.push({ query: { ...this.route.query, page: newPage } })
+        },
+        // Costruisce il link dell'articolo (dipende dal capitolo associato)
+        articleLink(article: StrapiEntity<Article>) {
+            const chapterSlug = article.attributes.chapter?.data?.attributes?.titleUrl
+            return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.titleUrl}` : `/capitolo/${article.attributes.titleUrl}`
+        },
+        // Recupera la cover dell'articolo (fallback immagine di default)
+        coverFor(article: StrapiEntity<Article>) {
+            const { getMediaUrl } = this.getStrapiHelpers()
+            return getMediaUrl(article.attributes.cover, 'medium') || '/img/header.jpg'
+        },
+        // Format della data in italiano esteso
+        formatDate(dateString: string) {
+            const date = new Date(dateString)
+            return date.toLocaleDateString('it-IT', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })
+        }
+    },
+
+    // LIFECYCLE: al montaggio recupero gli articoli iniziali
+    mounted() {
+        // Commento: eseguiamo subito il primo fetch quando il componente viene renderizzato
+        this.fetchArticles()
+    }
 })
 </script>
 
@@ -143,11 +226,13 @@ useHead({
     gap: 1rem;
     margin-top: 2rem;
 }
+
 .pager-btn {
     font-size: 0.85rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }
+
 .pager-btn[disabled] {
     opacity: .45;
     cursor: not-allowed;

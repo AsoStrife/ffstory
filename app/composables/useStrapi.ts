@@ -122,10 +122,10 @@ export const useStrapi = () => {
             if (cached) {
                 const { data, timestamp } = JSON.parse(cached)
                 const now = Date.now()
-                
+
                 // Se la cache è ancora valida (meno di 7 giorni), ritornala
                 if (now - timestamp < CACHE_DURATION) {
-                    console.log('Using cached chapters data')
+                    // console.log('Using cached chapters data')
                     return data
                 }
             }
@@ -136,13 +136,13 @@ export const useStrapi = () => {
                     sort: 'sort'
                 }
             })
-            
+
             // Salva in cache
             localStorage.setItem(CACHE_KEY, JSON.stringify({
                 data: data.data,
                 timestamp: Date.now()
             }))
-            
+
             console.log('Chapters data fetched and cached')
             return data.data
         } catch (error) {
