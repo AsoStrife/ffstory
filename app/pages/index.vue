@@ -63,6 +63,7 @@
 import { defineComponent } from 'vue'
 import { useRoute, useRouter, useHead } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../composables/useStrapi'
+import { useSeoDefaults } from '../composables/useSeoDefaults'
 
 // Tipi di supporto per chiarezza
 interface PaginationMeta {
@@ -80,12 +81,13 @@ export default defineComponent({
 
     // HEAD: definiamo i metadati usando useHead nel lifecycle setup
     setup() {
+        const { defaultTitle, defaultDescription } = useSeoDefaults()
         useHead({
-            title: 'FFStory - Tutto sulla saga di Final Fantasy',
+            title: defaultTitle,
             meta: [
                 {
                     name: 'description',
-                    content: 'Un hub moderno per guide, storie e curiosità dedicate alla saga di Final Fantasy.'
+                    content: defaultDescription
                 }
             ]
         })

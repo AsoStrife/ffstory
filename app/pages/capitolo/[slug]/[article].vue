@@ -40,6 +40,10 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, nextTick, watch } from 'vue'
+// Declare Nuxt composable to satisfy TypeScript without relying on module resolution here.
+// It will be provided at runtime by Nuxt.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare function useRuntimeConfig(): any
 import { useRoute } from 'vue-router'
 import { useHead } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../../../composables/useStrapi'
@@ -131,15 +135,71 @@ watch(renderedBody, async () => {
     }
 })
 
-useHead(() => ({
-    title: article.value ? `${article.value.attributes.title} - FFStory` : 'Articolo - FFStory',
-    meta: [
-        {
-            name: 'description',
-            content: article.value?.attributes.bodyShort || 'Articolo su Final Fantasy'
-        }
+useHead(() => {
+    const runtimeConfig = useRuntimeConfig()
+    const assetsBase = runtimeConfig.public.strapiAssetsBaseUrl || 'https://strapi.andreacorriga.com'
+    const titleSuffix = runtimeConfig.public.siteTitleSuffix || '• FFStory'
+    const rawTitle = article.value?.attributes.seo?.metaTitle
+        ? article.value.attributes.seo.metaTitle
+        : article.value
+            ? article.value.attributes.title
+            : 'Articolo'
+    const needsSuffix = titleSuffix && !rawTitle.endsWith(titleSuffix)
+    const title = needsSuffix ? `${rawTitle} ${titleSuffix}` : rawTitle
+
+    const description = article.value?.attributes.seo?.metaDescription
+        || article.value?.attributes.bodyShort
+        || 'Articolo su Final Fantasy'
+
+    const keywords = article.value?.attributes.seo?.keywords
+    const robots = article.value?.attributes.seo?.metaRobots
+    const canonical = article.value?.attributes.seo?.canonicalURL
+
+    // Cover (original size preferred, fallback to large format via getMediaUrl already computed above)
+    const coverData = article.value?.attributes.cover?.data?.attributes
+    const coverAbsoluteUrl = coverData?.url
+        ? coverData.url.startsWith('http')
+            ? coverData.url
+            : `${assetsBase}${coverData.url}`
+        : ''
+    const coverAlt = coverData?.alternativeText || coverData?.caption || title
+    const coverWidth = coverData?.width
+    const coverHeight = coverData?.height
+
+    const metaTags: any[] = [
+        { name: 'description', content: description }
     ]
-}))
+    if (keywords) metaTags.push({ name: 'keywords', content: keywords })
+    if (robots) metaTags.push({ name: 'robots', content: robots })
+
+    // Open Graph
+    metaTags.push({ property: 'og:type', content: 'article' })
+    metaTags.push({ property: 'og:title', content: title })
+    metaTags.push({ property: 'og:description', content: description })
+    if (coverAbsoluteUrl) {
+        metaTags.push({ property: 'og:image', content: coverAbsoluteUrl })
+        if (coverAlt) metaTags.push({ property: 'og:image:alt', content: coverAlt })
+        if (coverWidth) metaTags.push({ property: 'og:image:width', content: String(coverWidth) })
+        if (coverHeight) metaTags.push({ property: 'og:image:height', content: String(coverHeight) })
+    }
+
+    // Twitter Card
+    metaTags.push({ name: 'twitter:card', content: coverAbsoluteUrl ? 'summary_large_image' : 'summary' })
+    metaTags.push({ name: 'twitter:title', content: title })
+    metaTags.push({ name: 'twitter:description', content: description })
+    if (coverAbsoluteUrl) {
+        metaTags.push({ name: 'twitter:image', content: coverAbsoluteUrl })
+        if (coverAlt) metaTags.push({ name: 'twitter:image:alt', content: coverAlt })
+    }
+
+    return {
+        title,
+        meta: metaTags,
+        link: [
+            canonical ? { rel: 'canonical', href: canonical } : undefined
+        ].filter(Boolean) as any
+    }
+})
 </script>
 
 <style scoped>

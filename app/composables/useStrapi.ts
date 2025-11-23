@@ -1,7 +1,5 @@
 import axios from 'axios'
-
-const STRAPI_BASE_URL = 'https://strapi.andreacorriga.com/api'
-const STRAPI_ASSETS_BASE_URL = 'https://strapi.andreacorriga.com'
+import { useRuntimeConfig } from '#imports'
 
 interface StrapiResponse<T> {
     data: T
@@ -65,6 +63,17 @@ export interface Article {
     chapter?: {
         data: StrapiEntity<Chapter> | null
     }
+    // SEO component populated when requesting a single article
+    seo?: {
+        id?: number
+        metaTitle?: string
+        metaDescription?: string
+        keywords?: string
+        metaRobots?: string
+        structuredData?: any
+        metaViewport?: string | null
+        canonicalURL?: string | null
+    }
 }
 
 interface FetchArticlesOptions {
@@ -75,27 +84,24 @@ interface FetchArticlesPagedOptions extends FetchArticlesOptions {
     start?: number
 }
 
-const http = axios.create({
-    baseURL: STRAPI_BASE_URL,
-    timeout: 10000,
-    headers: {
-        Accept: 'application/json'
-    }
-})
-
-const buildAbsoluteUrl = (path?: string | null) => {
-    if (!path) {
-        return ''
-    }
-
-    if (/^https?:/i.test(path)) {
-        return path
-    }
-
-    return `${STRAPI_ASSETS_BASE_URL}${path}`
+const buildAbsoluteUrlFactory = (assetsBase: string) => (path?: string | null) => {
+    if (!path) return ''
+    if (/^https?:/i.test(path)) return path
+    return `${assetsBase}${path}`
 }
 
 export const useStrapi = () => {
+    const config = useRuntimeConfig()
+    const API_BASE = config.public.strapiBaseUrl || 'https://strapi.andreacorriga.com/api'
+    const ASSETS_BASE = config.public.strapiAssetsBaseUrl || 'https://strapi.andreacorriga.com'
+
+    const http = axios.create({
+        baseURL: API_BASE,
+        timeout: 10000,
+        headers: { Accept: 'application/json' }
+    })
+
+    const buildAbsoluteUrl = buildAbsoluteUrlFactory(ASSETS_BASE)
     const CACHE_KEY = 'ffstory_chapters_cache'
     const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 giorni in millisecondi
 
@@ -204,7 +210,8 @@ export const useStrapi = () => {
             const { data } = await http.get<StrapiResponse<StrapiEntity<Article>[]>>('/articles', {
                 params: {
                     'filters[titleUrl][$eq]': slug,
-                    populate: 'cover,chapter'
+                    // Include seo component for detailed page meta population
+                    populate: 'cover,chapter,seo'
                 }
             })
             return data.data?.[0] ?? null

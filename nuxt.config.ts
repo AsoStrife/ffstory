@@ -1,8 +1,20 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+// Declare process to satisfy TS without explicit node types (Nuxt provides it at build time)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const process: any
 export default defineNuxtConfig({
     compatibilityDate: '2024-11-01',
     devtools: {
         enabled: false
+    },
+    runtimeConfig: {
+        public: {
+            strapiBaseUrl: process.env.NUXT_PUBLIC_STRAPI_BASE_URL,
+            strapiAssetsBaseUrl: process.env.NUXT_PUBLIC_STRAPI_ASSETS_BASE_URL,
+            siteDefaultTitle: process.env.NUXT_PUBLIC_SITE_DEFAULT_TITLE,
+            siteDefaultDescription: process.env.NUXT_PUBLIC_SITE_DEFAULT_DESCRIPTION,
+            siteTitleSuffix: process.env.NUXT_PUBLIC_SITE_TITLE_SUFFIX
+        }
     },
     css: [
         'bootstrap/dist/css/bootstrap.min.css'
