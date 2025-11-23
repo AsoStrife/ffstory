@@ -61,7 +61,7 @@
 // Abbiamo sostituito useAsyncData con un fetch manuale per semplificare l'integrazione nell'Options API.
 
 import { defineComponent } from 'vue'
-import { useRoute, useRouter } from 'nuxt/app'
+import { useRoute, useRouter, useHead } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../composables/useStrapi'
 
 // Tipi di supporto per chiarezza
@@ -78,9 +78,9 @@ interface ArticlesResponse {
 export default defineComponent({
     name: 'HomePage',
 
-    // HEAD: definizione dei metadati della pagina (equivalente a useHead nel setup)
-    head() {
-        return {
+    // HEAD: definiamo i metadati usando useHead nel lifecycle setup
+    setup() {
+        useHead({
             title: 'FFStory - Tutto sulla saga di Final Fantasy',
             meta: [
                 {
@@ -88,7 +88,9 @@ export default defineComponent({
                     content: 'Un hub moderno per guide, storie e curiosità dedicate alla saga di Final Fantasy.'
                 }
             ]
-        }
+        })
+        // restituiamo nulla dallo setup perché il componente usa ancora Options API per dati/metodi
+        return {}
     },
 
     // DATA: stato reattivo di base della pagina
