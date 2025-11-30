@@ -8,7 +8,7 @@
                     <p class="section-eyebrow">Final Fantasy Story</p>
                     <h2>Ultimi articoli pubblicati</h2>
                 </div>
-                <NuxtLink v-if="primaryChapterLink" :to="primaryChapterLink" class="section-link">
+                <NuxtLink to="/capitoli" class="section-link">
                     Tutti i capitoli →
                 </NuxtLink>
             </div>
@@ -128,12 +128,6 @@ export default defineComponent({
         // Se posso andare alla pagina successiva
         canGoNext(): boolean {
             return (this.pagination.start + this.pagination.limit) < this.pagination.total
-        },
-        // Link al capitolo primario (primo articolo con capitolo associato)
-        primaryChapterLink(): string | null {
-            const first = this.latestArticlesList.find(article => Boolean(article.attributes.chapter?.data?.attributes?.titleUrl))
-            const chapterSlug = first?.attributes.chapter?.data?.attributes?.titleUrl
-            return chapterSlug ? `/capitolo/${chapterSlug}` : null
         }
     },
 

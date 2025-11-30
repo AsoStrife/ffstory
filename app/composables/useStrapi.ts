@@ -46,9 +46,14 @@ export interface MediaRelation {
 export interface Chapter {
     title: string
     titleUrl: string
+    description?: string
     createdAt: string
     updatedAt: string
     publishedAt: string
+    cover?: MediaRelation
+    articles?: {
+        data: StrapiEntity<Article>[] | null
+    }
 }
 
 export interface Article {
@@ -157,6 +162,22 @@ export const useStrapi = () => {
         }
     }
 
+    // Versione che carica i capitoli con cover e conteggio articoli (senza cache)
+    const fetchChaptersWithDetails = async () => {
+        try {
+            const { data } = await http.get<StrapiResponse<StrapiEntity<Chapter>[]>>('/chapters', {
+                params: {
+                    sort: 'sort',
+                    populate: 'cover,articles'
+                }
+            })
+            return data.data
+        } catch (error) {
+            console.error('Error fetching chapters with details:', error)
+            return []
+        }
+    }
+
     const fetchArticles = async (chapterTitleUrl?: string, options: FetchArticlesOptions = {}) => {
         try {
             const params: Record<string, string | number | undefined> = {
@@ -238,6 +259,7 @@ export const useStrapi = () => {
 
     return {
         fetchChapters,
+        fetchChaptersWithDetails,
         fetchArticles,
         fetchArticlesPaged,
         fetchArticleBySlug,

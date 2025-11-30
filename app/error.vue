@@ -10,6 +10,7 @@
                         <nav class="ff-topnav ff-topnav--attached">
                             <div class="ff-topnav__inner">
                                 <NuxtLink to="/" class="ff-topnav__link">Home</NuxtLink>
+                                <NuxtLink to="/capitoli" class="ff-topnav__link">Tutti i capitoli</NuxtLink>
                                 <NuxtLink to="/storia" class="ff-topnav__link">Storia di FFStory</NuxtLink>
                             </div>
                         </nav>
@@ -94,6 +95,8 @@
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
                                     </NuxtLink>
+                                    <NuxtLink to="/capitoli" class="ff-sidebar__link"
+                                        @click="closeSidebarOnMobile">Tutti i capitoli</NuxtLink>
                                     <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
                                 </nav>

@@ -13,6 +13,8 @@
                             <div class="ff-topnav__inner">
                                 <NuxtLink to="/" class="ff-topnav__link" :class="{ 'ff-topnav__link--active': isHome }">
                                     Home</NuxtLink>
+                                <NuxtLink to="/capitoli" class="ff-topnav__link"
+                                    :class="{ 'ff-topnav__link--active': isCapitoli }">Tutti i capitoli</NuxtLink>
                                 <NuxtLink to="/storia" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isStoria }">Storia di FFStory</NuxtLink>
                                 <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-topnav__link"
@@ -52,6 +54,8 @@
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
                                     </NuxtLink>
+                                    <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">Tutti
+                                        i capitoli</NuxtLink>
                                     <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
                                     <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
@@ -111,6 +115,7 @@ const route = useRoute()
 const chapterArticles = ref<StrapiEntity<Article>[]>([])
 
 const isHome = computed(() => route.path === '/')
+const isCapitoli = computed(() => route.path === '/capitoli')
 const isStoria = computed(() => route.path === '/storia')
 const isTraduttore = computed(() => route.path === '/capitolo/final-fantasy-x/traduttore-albhed')
 
@@ -178,6 +183,8 @@ const currentYear = new Date().getFullYear()
 const mainClass = computed(() => {
     // homepage
     if (route.path === '/') return ''
+    // pagina tutti i capitoli
+    if (route.path === '/capitoli') return ''
     // pagina lista articoli capitolo (/capitolo/:slug)
     if (isChapterRoute.value && !activeArticleSlug.value) return ''
     // pagina traduttore albhed
