@@ -40,16 +40,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, nextTick, watch } from 'vue'
-// Declare Nuxt composable to satisfy TypeScript without relying on module resolution here.
-// It will be provided at runtime by Nuxt.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare function useRuntimeConfig(): any
 import { useRoute } from 'vue-router'
-import { useHead } from 'nuxt/app'
+import { useHead, useRuntimeConfig } from 'nuxt/app'
 import { useStrapi, type Article, type StrapiEntity } from '../../../composables/useStrapi'
 import { useMarkdown } from '../../../composables/useMarkdown'
 
 const route = useRoute()
+const runtimeConfig = useRuntimeConfig()
 const { fetchArticleBySlug, getMediaUrl } = useStrapi()
 const { renderMarkdown } = useMarkdown()
 
@@ -135,10 +132,10 @@ watch(renderedBody, async () => {
     }
 })
 
+const assetsBase = runtimeConfig.public.strapiAssetsBaseUrl as string || 'https://strapi.andreacorriga.com'
+const titleSuffix = runtimeConfig.public.siteTitleSuffix as string || '• FFStory'
+
 useHead(() => {
-    const runtimeConfig = useRuntimeConfig()
-    const assetsBase = runtimeConfig.public.strapiAssetsBaseUrl || 'https://strapi.andreacorriga.com'
-    const titleSuffix = runtimeConfig.public.siteTitleSuffix || '• FFStory'
     const rawTitle = article.value?.attributes.seo?.metaTitle
         ? article.value.attributes.seo.metaTitle
         : article.value
