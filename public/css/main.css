@@ -848,22 +848,49 @@ h2 {
   .ff-shell {
     margin-top: -4.5rem;
   }
-
-  .ff-sidebar {
+  /* Mobile overlay container: holds stacked sidebars */
+  .col-sidebar {
     position: fixed;
-      inset: auto clamp(1.2rem, 5vw, 1.75rem) clamp(1.2rem, 5vw, 1.75rem);
-      top: clamp(4.5rem, 12vw, 5.5rem);
-      transform: translateX(120%);
+    top: clamp(4.5rem, 12vw, 5.5rem);
+    right: clamp(2rem, 8vw, 2.75rem);
+    left: clamp(3rem, 10vw, 3.5rem);
+    z-index: 60;
+    max-width: 360px;
+    margin-left: auto;
+    transform: translateX(120%);
     opacity: 0;
     pointer-events: none;
-    max-width: 340px;
-      margin-left: auto;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    will-change: transform, opacity;
   }
 
-  .ff-sidebar--open {
+  .col-sidebar--open {
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* Panel that wraps multiple sidebars and provides scrolling */
+  .col-sidebar {
+    background: var(--ff-surface);
+    border: 1px solid var(--ff-border);
+    border-radius: var(--ff-radius-md);
+    box-shadow: var(--ff-shadow-soft);
+    backdrop-filter: blur(10px);
+    padding: max(clamp(0.75rem, 3vw, 1rem), env(safe-area-inset-left));
+    max-height: calc(100vh - clamp(6rem, 18vw, 8rem));
+    overflow: auto; /* scroll inside overlay instead of overlapping */
+  }
+
+  /* Inside overlay, keep sidebars in normal flow */
+  .col-sidebar .ff-sidebar {
+    position: static;
+    top: auto;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    max-width: none;
+    margin-left: 0;
   }
 
   .ff-main {

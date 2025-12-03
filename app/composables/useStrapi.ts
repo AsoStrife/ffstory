@@ -62,6 +62,7 @@ export interface Article {
     slug: string
     bodyShort: string
     body: string
+    tableOfContents?: string
     createdAt: string
     updatedAt: string
     publishedAt: string

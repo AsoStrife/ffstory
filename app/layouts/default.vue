@@ -14,7 +14,7 @@
                                 <NuxtLink to="/" class="ff-topnav__link" :class="{ 'ff-topnav__link--active': isHome }">
                                     Home</NuxtLink>
                                 <NuxtLink to="/capitoli" class="ff-topnav__link"
-                                    :class="{ 'ff-topnav__link--active': isCapitoli }">Tutti i capitoli</NuxtLink>
+                                    :class="{ 'ff-topnav__link--active': isCapitoli }">Tutti i Final Fantasy</NuxtLink>
                                 <NuxtLink to="/storia" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isStoria }">Storia di FFStory</NuxtLink>
                                 <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-topnav__link"
@@ -45,7 +45,7 @@
                     </main>
                 </div>
 
-                <div class="col-12 col-lg-4 col-xl-4 col-sidebar">
+                <div class="col-12 col-lg-4 col-xl-4 col-sidebar" :class="{ 'col-sidebar--open': sidebarOpen }">
                     <!-- Navigazione primaria (solo mobile) -->
                     <div class="ff-sidebar mobile-only" :class="{ 'ff-sidebar--open': sidebarOpen }">
                         <section class="ff-sidebar__section">
@@ -71,7 +71,7 @@
                         <section class="ff-sidebar__section">
                             <p class="ff-sidebar__label ff-sidebar__label--collapsible"
                                 @click="articlesExpanded = !articlesExpanded">
-                                <span>Articoli del capitolo</span>
+                                <span>Articoli</span>
                                 <span class="ff-sidebar__toggle"
                                     :class="{ 'ff-sidebar__toggle--open': articlesExpanded }">▼</span>
                             </p>
@@ -91,7 +91,7 @@
                         <section class="ff-sidebar__section">
                             <p class="ff-sidebar__label ff-sidebar__label--collapsible"
                                 @click="chaptersExpanded = !chaptersExpanded">
-                                <span>Capitoli</span>
+                                <span>Final Fantasy Saga</span>
                                 <span class="ff-sidebar__toggle"
                                     :class="{ 'ff-sidebar__toggle--open': chaptersExpanded }">▼</span>
                             </p>
