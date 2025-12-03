@@ -190,8 +190,8 @@ export default defineComponent({
         },
         // Costruisce il link dell'articolo (dipende dal capitolo associato)
         articleLink(article: StrapiEntity<Article>) {
-            const chapterSlug = article.attributes.chapter?.data?.attributes?.titleUrl
-            return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.titleUrl}` : `/capitolo/${article.attributes.titleUrl}`
+            const chapterSlug = article.attributes.chapter?.data?.attributes?.slug
+            return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.slug}` : `/capitolo/${article.attributes.slug}`
         },
         // Recupera la cover dell'articolo (fallback immagine di default)
         coverFor(article: StrapiEntity<Article>) {

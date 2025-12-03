@@ -69,7 +69,7 @@ const coverFor = (article: StrapiEntity<Article>) => {
 }
 
 const articleLink = (article: StrapiEntity<Article>) => {
-    return `/capitolo/${chapterSlug}/${article.attributes.titleUrl}`
+    return `/capitolo/${chapterSlug}/${article.attributes.slug}`
 }
 
 const formatDate = (dateString: string) => {
@@ -86,7 +86,7 @@ onMounted(async () => {
         pending.value = true
 
         const chapters = await fetchChapters()
-        const chapter = chapters.find((ch: StrapiEntity<Chapter>) => ch.attributes.titleUrl === chapterSlug)
+        const chapter = chapters.find((ch: StrapiEntity<Chapter>) => ch.attributes.slug === chapterSlug)
 
         if (chapter) {
             chapterTitle.value = chapter.attributes.title

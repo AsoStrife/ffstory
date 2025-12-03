@@ -95,8 +95,8 @@
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
                                     </NuxtLink>
-                                    <NuxtLink to="/capitoli" class="ff-sidebar__link"
-                                        @click="closeSidebarOnMobile">Tutti i capitoli</NuxtLink>
+                                    <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
+                                        Tutti i capitoli</NuxtLink>
                                     <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
                                 </nav>
@@ -106,7 +106,7 @@
                                 <p class="ff-sidebar__label">Capitoli</p>
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink v-for="chapter in chapters" :key="chapter.id"
-                                        :to="`/capitolo/${chapter.attributes.titleUrl}`" class="ff-sidebar__link"
+                                        :to="`/capitolo/${chapter.attributes.slug}`" class="ff-sidebar__link"
                                         @click="closeSidebarOnMobile">
                                         {{ chapter.attributes.title }}
                                     </NuxtLink>
@@ -158,8 +158,8 @@ const { data: latestArticles, pending: articlesPending, error: articlesError } =
 const latestArticlesList = computed(() => latestArticles.value ?? [])
 
 const articleLink = (article: StrapiEntity<Article>) => {
-    const chapterSlug = article.attributes.chapter?.data?.attributes?.titleUrl
-    return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.titleUrl}` : `/capitolo/${article.attributes.titleUrl}`
+    const chapterSlug = article.attributes.chapter?.data?.attributes?.slug
+    return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.slug}` : `/capitolo/${article.attributes.slug}`
 }
 
 const coverFor = (article: StrapiEntity<Article>) => {

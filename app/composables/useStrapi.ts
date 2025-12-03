@@ -45,12 +45,12 @@ export interface MediaRelation {
 
 export interface Chapter {
     title: string
-    titleUrl: string
+    slug: string
     description?: string
     createdAt: string
     updatedAt: string
     publishedAt: string
-    cover?: MediaRelation
+    logo?: MediaRelation
     articles?: {
         data: StrapiEntity<Article>[] | null
     }
@@ -58,7 +58,8 @@ export interface Chapter {
 
 export interface Article {
     title: string
-    titleUrl: string
+    menuTitle?: string | null
+    slug: string
     bodyShort: string
     body: string
     createdAt: string
@@ -162,13 +163,13 @@ export const useStrapi = () => {
         }
     }
 
-    // Versione che carica i capitoli con cover e conteggio articoli (senza cache)
+    // Versione che carica i capitoli con logo e conteggio articoli (senza cache)
     const fetchChaptersWithDetails = async () => {
         try {
             const { data } = await http.get<StrapiResponse<StrapiEntity<Chapter>[]>>('/chapters', {
                 params: {
                     sort: 'sort',
-                    populate: 'cover,articles'
+                    populate: 'logo,articles'
                 }
             })
             return data.data
@@ -178,7 +179,7 @@ export const useStrapi = () => {
         }
     }
 
-    const fetchArticles = async (chapterTitleUrl?: string, options: FetchArticlesOptions = {}) => {
+    const fetchArticles = async (chapterSlug?: string, options: FetchArticlesOptions = {}) => {
         try {
             const params: Record<string, string | number | undefined> = {
                 populate: 'cover,chapter',
@@ -186,8 +187,8 @@ export const useStrapi = () => {
                 'pagination[limit]': options.limit
             }
 
-            if (chapterTitleUrl) {
-                params['filters[chapter][titleUrl][$eq]'] = chapterTitleUrl
+            if (chapterSlug) {
+                params['filters[chapter][slug][$eq]'] = chapterSlug
             }
 
             const { data } = await http.get<StrapiResponse<StrapiEntity<Article>[]>>('/articles', {
@@ -202,7 +203,7 @@ export const useStrapi = () => {
     }
 
     // Variante che ritorna anche la meta di paginazione senza alterare la funzione esistente
-    const fetchArticlesPaged = async (chapterTitleUrl?: string, options: FetchArticlesPagedOptions = {}) => {
+    const fetchArticlesPaged = async (chapterSlug?: string, options: FetchArticlesPagedOptions = {}) => {
         try {
             const params: Record<string, string | number | undefined> = {
                 populate: 'cover,chapter',
@@ -211,8 +212,8 @@ export const useStrapi = () => {
                 'pagination[start]': options.start
             }
 
-            if (chapterTitleUrl) {
-                params['filters[chapter][titleUrl][$eq]'] = chapterTitleUrl
+            if (chapterSlug) {
+                params['filters[chapter][slug][$eq]'] = chapterSlug
             }
 
             const { data } = await http.get<StrapiResponse<StrapiEntity<Article>[]>>('/articles', {
@@ -230,7 +231,7 @@ export const useStrapi = () => {
         try {
             const { data } = await http.get<StrapiResponse<StrapiEntity<Article>[]>>('/articles', {
                 params: {
-                    'filters[titleUrl][$eq]': slug,
+                    'filters[slug][$eq]': slug,
                     // Include seo component for detailed page meta population
                     populate: 'cover,chapter,seo'
                 }

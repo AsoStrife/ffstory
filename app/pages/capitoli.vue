@@ -20,7 +20,7 @@
         <template v-else-if="chapters.length">
             <div class="row row-cols-1 row-cols-lg-2 g-4 ff-article-grid">
                 <div v-for="chapter in chapters" :key="chapter.id" class="col">
-                    <NuxtLink class="article-card h-100" :to="`/capitolo/${chapter.attributes.titleUrl}`">
+                    <NuxtLink class="article-card h-100" :to="`/capitolo/${chapter.attributes.slug}`">
                         <div class="article-card__media">
                             <img :src="coverFor(chapter)" :alt="chapter.attributes.title" class="article-card__image"
                                 loading="lazy" />
@@ -59,7 +59,7 @@ const pending = ref(true)
 const error = ref(false)
 
 const coverFor = (chapter: StrapiEntity<Chapter>) => {
-    return getMediaUrl(chapter.attributes.cover, 'medium') || '/img/header.jpg'
+    return getMediaUrl(chapter.attributes.logo, 'medium') || '/img/header.jpg'
 }
 
 const descriptionFor = (chapter: StrapiEntity<Chapter>) => {

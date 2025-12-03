@@ -54,7 +54,8 @@
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
                                     </NuxtLink>
-                                    <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">Tutti
+                                    <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
+                                        Tutti
                                         i capitoli</NuxtLink>
                                     <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
@@ -66,11 +67,11 @@
                                 <p class="ff-sidebar__label">Articoli del capitolo</p>
                                 <nav class="ff-sidebar__nav ff-sidebar__nav--sub">
                                     <NuxtLink v-for="article in chapterArticles" :key="article.id"
-                                        :to="`/capitolo/${activeChapterSlug}/${article.attributes.titleUrl}`"
+                                        :to="`/capitolo/${activeChapterSlug}/${article.attributes.slug}`"
                                         class="ff-sidebar__link ff-sidebar__link--sub"
-                                        :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.titleUrl) }"
+                                        :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.slug) }"
                                         @click="closeSidebarOnMobile">
-                                        {{ article.attributes.title }}
+                                        {{ article.attributes.menuTitle || article.attributes.title }}
                                     </NuxtLink>
                                 </nav>
                             </section>
@@ -80,8 +81,8 @@
                                 <nav class="ff-sidebar__nav">
                                     <!-- Home link removed as requested -->
                                     <NuxtLink v-for="chapter in chapters" :key="chapter.id"
-                                        :to="`/capitolo/${chapter.attributes.titleUrl}`" class="ff-sidebar__link"
-                                        :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.titleUrl) }"
+                                        :to="`/capitolo/${chapter.attributes.slug}`" class="ff-sidebar__link"
+                                        :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.slug) }"
                                         @click="closeSidebarOnMobile">
                                         {{ chapter.attributes.title }}
                                     </NuxtLink>
@@ -132,14 +133,20 @@ const activeArticleSlug = computed(() => {
     if (Array.isArray(rawSlug)) {
         return rawSlug[0] || null
     }
-    return typeof rawSlug === 'string' ? rawSlug : null
+    return typeof rawSlug === 'string' && rawSlug.length > 0 ? rawSlug : null
 })
 
 const isChapterRoute = computed(() => !!activeChapterSlug.value)
 
-const isChapterActive = (slug: string) => activeChapterSlug.value === slug
+const isChapterActive = (slug: string) => {
+    // Un capitolo è attivo solo se siamo sulla sua pagina indice (senza articolo)
+    return activeChapterSlug.value === slug && !activeArticleSlug.value
+}
 
-const isArticleActive = (slug: string) => activeArticleSlug.value === slug
+const isArticleActive = (slug: string) => {
+    // Un articolo è attivo solo se abbiamo effettivamente un articolo selezionato
+    return activeArticleSlug.value !== null && activeArticleSlug.value === slug
+}
 
 watch(
     activeChapterSlug,
