@@ -46,50 +46,67 @@
                 </div>
 
                 <div class="col-12 col-lg-4 col-xl-4 col-sidebar">
-                    <aside class="ff-sidebar" :class="{ 'ff-sidebar--open': sidebarOpen }">
-                        <div class="ff-sidebar__inner">
-                            <!-- Navigazione primaria (solo mobile) -->
-                            <section class="ff-sidebar__section mobile-only">
-                                <p class="ff-sidebar__label">Navigazione</p>
-                                <nav class="ff-sidebar__nav">
-                                    <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
-                                    </NuxtLink>
-                                    <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
-                                        Tutti
-                                        i capitoli</NuxtLink>
-                                    <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
-                                        di FFStory</NuxtLink>
-                                    <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
-                                        @click="closeSidebarOnMobile">Traduttore Al Bhed</NuxtLink>
-                                </nav>
-                            </section>
-                            <section v-if="isChapterRoute && chapterArticles.length" class="ff-sidebar__section">
-                                <p class="ff-sidebar__label">Articoli del capitolo</p>
-                                <nav class="ff-sidebar__nav ff-sidebar__nav--sub">
-                                    <NuxtLink v-for="article in chapterArticles" :key="article.id"
-                                        :to="`/capitolo/${activeChapterSlug}/${article.attributes.slug}`"
-                                        class="ff-sidebar__link ff-sidebar__link--sub"
-                                        :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.slug) }"
-                                        @click="closeSidebarOnMobile">
-                                        {{ article.attributes.menuTitle || article.attributes.title }}
-                                    </NuxtLink>
-                                </nav>
-                            </section>
+                    <!-- Navigazione primaria (solo mobile) -->
+                    <div class="ff-sidebar mobile-only" :class="{ 'ff-sidebar--open': sidebarOpen }">
+                        <section class="ff-sidebar__section">
+                            <p class="ff-sidebar__label">Navigazione</p>
+                            <nav class="ff-sidebar__nav">
+                                <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
+                                </NuxtLink>
+                                <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
+                                    Tutti
+                                    i capitoli</NuxtLink>
+                                <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">
+                                    Storia
+                                    di FFStory</NuxtLink>
+                                <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
+                                    @click="closeSidebarOnMobile">Traduttore Al Bhed
+                                </NuxtLink>
+                            </nav>
+                        </section>
+                    </div>
 
-                            <section class="ff-sidebar__section">
-                                <p class="ff-sidebar__label">Capitoli</p>
-                                <nav class="ff-sidebar__nav">
-                                    <!-- Home link removed as requested -->
-                                    <NuxtLink v-for="chapter in chapters" :key="chapter.id"
-                                        :to="`/capitolo/${chapter.attributes.slug}`" class="ff-sidebar__link"
-                                        :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.slug) }"
-                                        @click="closeSidebarOnMobile">
-                                        {{ chapter.attributes.title }}
-                                    </NuxtLink>
-                                </nav>
-                            </section>
-                        </div>
-                    </aside>
+                    <div v-if="isChapterRoute && chapterArticles.length" class="ff-sidebar"
+                        :class="{ 'ff-sidebar--open': sidebarOpen }">
+                        <section class="ff-sidebar__section">
+                            <p class="ff-sidebar__label ff-sidebar__label--collapsible"
+                                @click="articlesExpanded = !articlesExpanded">
+                                <span>Articoli del capitolo</span>
+                                <span class="ff-sidebar__toggle"
+                                    :class="{ 'ff-sidebar__toggle--open': articlesExpanded }">▼</span>
+                            </p>
+                            <nav v-show="articlesExpanded" class="ff-sidebar__nav ff-sidebar__nav--sub">
+                                <NuxtLink v-for="article in chapterArticles" :key="article.id"
+                                    :to="`/capitolo/${activeChapterSlug}/${article.attributes.slug}`"
+                                    class="ff-sidebar__link ff-sidebar__link--sub"
+                                    :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.slug) }"
+                                    @click="closeSidebarOnMobile">
+                                    {{ article.attributes.menuTitle || article.attributes.title }}
+                                </NuxtLink>
+                            </nav>
+                        </section>
+                    </div>
+
+                    <div class="ff-sidebar" :class="{ 'ff-sidebar--open': sidebarOpen }">
+                        <section class="ff-sidebar__section">
+                            <p class="ff-sidebar__label ff-sidebar__label--collapsible"
+                                @click="chaptersExpanded = !chaptersExpanded">
+                                <span>Capitoli</span>
+                                <span class="ff-sidebar__toggle"
+                                    :class="{ 'ff-sidebar__toggle--open': chaptersExpanded }">▼</span>
+                            </p>
+                            <nav v-show="chaptersExpanded" class="ff-sidebar__nav">
+                                <!-- Home link removed as requested -->
+                                <NuxtLink v-for="chapter in chapters" :key="chapter.id"
+                                    :to="`/capitolo/${chapter.attributes.slug}`" class="ff-sidebar__link"
+                                    :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.slug) }"
+                                    @click="closeSidebarOnMobile">
+                                    {{ chapter.attributes.title }}
+                                </NuxtLink>
+                            </nav>
+                        </section>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -115,6 +132,10 @@ const route = useRoute()
 
 const chapterArticles = ref<StrapiEntity<Article>[]>([])
 
+// Stati per le sezioni collassabili
+const articlesExpanded = ref(true)
+const chaptersExpanded = ref(true)
+
 const isHome = computed(() => route.path === '/')
 const isCapitoli = computed(() => route.path === '/capitoli')
 const isStoria = computed(() => route.path === '/storia')
@@ -136,6 +157,9 @@ const activeArticleSlug = computed(() => {
     return typeof rawSlug === 'string' && rawSlug.length > 0 ? rawSlug : null
 })
 
+// Determina se siamo in una pagina di dettaglio articolo
+const isArticleDetailPage = computed(() => !!activeArticleSlug.value)
+
 const isChapterRoute = computed(() => !!activeChapterSlug.value)
 
 const isChapterActive = (slug: string) => {
@@ -147,6 +171,23 @@ const isArticleActive = (slug: string) => {
     // Un articolo è attivo solo se abbiamo effettivamente un articolo selezionato
     return activeArticleSlug.value !== null && activeArticleSlug.value === slug
 }
+
+// Aggiorna lo stato di espansione in base alla route
+watch(
+    () => route.path,
+    () => {
+        // Se siamo nella pagina di dettaglio di un articolo, chiudi i capitoli di default
+        if (isArticleDetailPage.value) {
+            chaptersExpanded.value = false
+            articlesExpanded.value = true
+        } else {
+            // Nella home, capitoli o altre pagine, apri i capitoli
+            chaptersExpanded.value = true
+            articlesExpanded.value = true
+        }
+    },
+    { immediate: true }
+)
 
 watch(
     activeChapterSlug,
