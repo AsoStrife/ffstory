@@ -15,7 +15,7 @@
                                     Home</NuxtLink>
                                 <NuxtLink to="/capitoli" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isCapitoli }">Tutti i Final Fantasy</NuxtLink>
-                                <NuxtLink to="/storia" class="ff-topnav__link"
+                                <NuxtLink to="/storia-ffstory" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isStoria }">Storia di FFStory</NuxtLink>
                                 <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isTraduttore }">
@@ -56,7 +56,7 @@
                                 <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
                                     Tutti
                                     i capitoli</NuxtLink>
-                                <NuxtLink to="/storia" class="ff-sidebar__link" @click="closeSidebarOnMobile">
+                                <NuxtLink to="/storia-ffstory" class="ff-sidebar__link" @click="closeSidebarOnMobile">
                                     Storia
                                     di FFStory</NuxtLink>
                                 <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
@@ -71,7 +71,7 @@
                         <section class="ff-sidebar__section">
                             <p class="ff-sidebar__label ff-sidebar__label--collapsible"
                                 @click="articlesExpanded = !articlesExpanded">
-                                <span>Articoli</span>
+                                <span>Articoli su {{ activeChapterTitle }}</span>
                                 <span class="ff-sidebar__toggle"
                                     :class="{ 'ff-sidebar__toggle--open': articlesExpanded }">▼</span>
                             </p>
@@ -138,7 +138,7 @@ const chaptersExpanded = ref(true)
 
 const isHome = computed(() => route.path === '/')
 const isCapitoli = computed(() => route.path === '/capitoli')
-const isStoria = computed(() => route.path === '/storia')
+const isStoria = computed(() => route.path === '/storia-ffstory')
 const isTraduttore = computed(() => route.path === '/capitolo/final-fantasy-x/traduttore-albhed')
 
 const activeChapterSlug = computed(() => {
@@ -161,6 +161,12 @@ const activeArticleSlug = computed(() => {
 const isArticleDetailPage = computed(() => !!activeArticleSlug.value)
 
 const isChapterRoute = computed(() => !!activeChapterSlug.value)
+
+const activeChapterTitle = computed(() => {
+    if (!activeChapterSlug.value) return ''
+    const chapter = chapters.value.find(c => c.attributes.slug === activeChapterSlug.value)
+    return chapter?.attributes.title || activeChapterSlug.value
+})
 
 const isChapterActive = (slug: string) => {
     // Un capitolo è attivo solo se siamo sulla sua pagina indice (senza articolo)

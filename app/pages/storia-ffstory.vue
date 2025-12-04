@@ -1,30 +1,23 @@
 <template>
     <div v-if="pending" class="loading">
-        Caricamento articolo...
+        Caricamento...
     </div>
 
-    <div v-else-if="error || !article" class="alert alert-danger">
-        Articolo non trovato.
+    <div v-else-if="error || !history" class="alert alert-danger">
+        Contenuto non trovato.
     </div>
 
     <div v-else class="article-detail">
-        <div class="article-breadcrumb">
-            <NuxtLink :to="`/capitolo/${chapterSlug}`" class="article-breadcrumb__link">← Torna al capitolo</NuxtLink>
-        </div>
-
         <div v-if="coverUrl" class="article-hero">
-            <img :src="coverUrl" :alt="article.attributes.title" loading="lazy" />
+            <img :src="coverUrl" :alt="history.attributes.title" loading="lazy" />
         </div>
 
-        <h1>{{ article.attributes.title }}</h1>
+        <h1>{{ history.attributes.title }}</h1>
 
         <div class="article-meta">
-            <span>Pubblicato: {{ formatDate(article.attributes.publishedAt) }}</span>
-            <span v-if="article.attributes.updatedAt !== article.attributes.publishedAt">
-                Aggiornato: {{ formatDate(article.attributes.updatedAt) }}
-            </span>
-            <span v-if="article.attributes.chapter?.data">
-                Capitolo: {{ article.attributes.chapter.data.attributes.title }}
+            <span>Pubblicato: {{ formatDate(history.attributes.publishedAt) }}</span>
+            <span v-if="history.attributes.updatedAt !== history.attributes.publishedAt">
+                Aggiornato: {{ formatDate(history.attributes.updatedAt) }}
             </span>
         </div>
 
@@ -52,31 +45,20 @@
         </Teleport>
 
         <div class="article-body" v-html="renderedBody"></div>
-
-        <div class="article-footer">
-            <NuxtLink :to="`/capitolo/${chapterSlug}`" class="ff-button ff-button--ghost">
-                ← Torna agli articoli
-            </NuxtLink>
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { useHead, useRuntimeConfig } from 'nuxt/app'
-import { useStrapi, type Article, type StrapiEntity } from '../../../composables/useStrapi'
-import { useMarkdown } from '../../../composables/useMarkdown'
+import { useStrapi, type FFStoryHistory, type StrapiEntity } from '../composables/useStrapi'
+import { useMarkdown } from '../composables/useMarkdown'
 
-const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
-const { fetchArticleBySlug, getMediaUrl } = useStrapi()
+const { fetchFFStoryHistory, getMediaUrlFromArray } = useStrapi()
 const { renderMarkdown } = useMarkdown()
 
-const chapterSlug = route.params.slug as string
-const articleSlug = route.params.article as string
-
-const article = ref<StrapiEntity<Article> | null>(null)
+const history = ref<StrapiEntity<FFStoryHistory> | null>(null)
 const pending = ref(true)
 const error = ref(false)
 
@@ -86,14 +68,14 @@ const showFloatingToc = ref(false)
 const isFloatingTocOpen = ref(false)
 
 const hasTableOfContents = computed(() => {
-    const toc = article.value?.attributes.tableOfContents
+    const toc = history.value?.attributes.tableOfContents
     if (!toc) return false
     if (typeof toc === 'string') return toc.trim().length > 0
     return false
 })
 
 const renderedTableOfContents = computed(() => {
-    const toc = article.value?.attributes.tableOfContents
+    const toc = history.value?.attributes.tableOfContents
     if (!toc || typeof toc !== 'string') return ''
     return renderMarkdown(toc)
 })
@@ -140,16 +122,15 @@ const cleanupTocObserver = () => {
 }
 
 const renderedBody = computed(() => {
-    if (!article.value) return ''
-    return renderMarkdown(article.value.attributes.body || '')
+    if (!history.value) return ''
+    return renderMarkdown(history.value.attributes.body || '')
 })
 
 const coverUrl = computed(() => {
-    if (!article.value) {
+    if (!history.value) {
         return ''
     }
-
-    return getMediaUrl(article.value.attributes.cover, 'large') || ''
+    return getMediaUrlFromArray(history.value.attributes.cover, 'large') || ''
 })
 
 const formatDate = (dateString: string) => {
@@ -164,21 +145,21 @@ const formatDate = (dateString: string) => {
 onMounted(async () => {
     try {
         pending.value = true
-        article.value = await fetchArticleBySlug(articleSlug)
+        history.value = await fetchFFStoryHistory()
 
-        if (!article.value) {
+        if (!history.value) {
             error.value = true
         }
 
         pending.value = false
 
-        // Setup TOC observer after article is loaded
+        // Setup TOC observer after content is loaded
         await nextTick()
         if (hasTableOfContents.value && tocInlineRef.value) {
             setupTocObserver()
         }
     } catch (e) {
-        console.error('Error loading article:', e)
+        console.error('Error loading FFStory history:', e)
         error.value = true
         pending.value = false
     }
@@ -228,24 +209,26 @@ const assetsBase = runtimeConfig.public.strapiAssetsBaseUrl as string || 'https:
 const titleSuffix = runtimeConfig.public.siteTitleSuffix as string || '• FFStory'
 
 useHead(() => {
-    const rawTitle = article.value?.attributes.seo?.metaTitle
-        ? article.value.attributes.seo.metaTitle
-        : article.value
-            ? article.value.attributes.title
-            : 'Articolo'
+    const seo = history.value?.attributes.seo?.[0]
+    
+    const rawTitle = seo?.metaTitle
+        ? seo.metaTitle
+        : history.value
+            ? history.value.attributes.title
+            : 'La Storia di FFStory'
     const needsSuffix = titleSuffix && !rawTitle.endsWith(titleSuffix)
     const title = needsSuffix ? `${rawTitle} ${titleSuffix}` : rawTitle
 
-    const description = article.value?.attributes.seo?.metaDescription
-        || article.value?.attributes.bodyShort
-        || 'Articolo su Final Fantasy'
+    const description = seo?.metaDescription
+        || history.value?.attributes.bodyShort
+        || 'La storia di FFStory, il fan site dedicato a Final Fantasy'
 
-    const keywords = article.value?.attributes.seo?.keywords
-    const robots = article.value?.attributes.seo?.metaRobots
-    const canonical = article.value?.attributes.seo?.canonicalURL
+    const keywords = seo?.keywords
+    const robots = seo?.metaRobots
+    const canonical = seo?.canonicalURL
 
-    // Cover (original size preferred, fallback to large format via getMediaUrl already computed above)
-    const coverData = article.value?.attributes.cover?.data?.attributes
+    // Cover (original size preferred)
+    const coverData = history.value?.attributes.cover?.data?.[0]?.attributes
     const coverAbsoluteUrl = coverData?.url
         ? coverData.url.startsWith('http')
             ? coverData.url
@@ -292,20 +275,6 @@ useHead(() => {
 </script>
 
 <style scoped>
-.article-breadcrumb {
-    margin-bottom: 1.5rem;
-}
-
-.article-breadcrumb__link {
-    color: var(--ff-primary);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.article-breadcrumb__link:hover {
-    text-decoration: underline;
-}
-
 .article-meta {
     display: flex;
     flex-wrap: wrap;
@@ -314,10 +283,6 @@ useHead(() => {
     color: var(--ff-muted);
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--ff-border);
-}
-
-.article-footer {
-    margin-top: 2.5rem;
 }
 
 /* Fallback table styles to mimic Bootstrap's table look when Bootstrap isn't loaded.

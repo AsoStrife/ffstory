@@ -83,6 +83,37 @@ export interface Article {
     }
 }
 
+export interface SeoComponent {
+    id?: number
+    metaTitle?: string
+    metaDescription?: string
+    keywords?: string
+    metaRobots?: string | null
+    structuredData?: any
+    metaViewport?: string | null
+    canonicalURL?: string | null
+}
+
+export interface MediaArrayRelation {
+    data: Array<{
+        id: number
+        attributes: UploadFile
+    }> | null
+}
+
+export interface FFStoryHistory {
+    title: string
+    slug: string
+    bodyShort: string
+    body: string
+    tableOfContents?: string
+    createdAt: string
+    updatedAt: string
+    publishedAt: string
+    cover?: MediaArrayRelation
+    seo?: SeoComponent[]
+}
+
 interface FetchArticlesOptions {
     limit?: number
 }
@@ -259,12 +290,48 @@ export const useStrapi = () => {
         return buildAbsoluteUrl(data.attributes.url)
     }
 
+    const getMediaUrlFromArray = (media?: MediaArrayRelation | null, preferredFormat?: string) => {
+        const dataArray = media?.data
+
+        if (!dataArray || dataArray.length === 0) {
+            return ''
+        }
+
+        const firstMedia = dataArray[0]
+        if (!firstMedia?.attributes) {
+            return ''
+        }
+
+        const formats = firstMedia.attributes.formats
+        if (preferredFormat && formats?.[preferredFormat]?.url) {
+            return buildAbsoluteUrl(formats[preferredFormat].url)
+        }
+
+        return buildAbsoluteUrl(firstMedia.attributes.url)
+    }
+
+    const fetchFFStoryHistory = async () => {
+        try {
+            const { data } = await http.get<{ data: StrapiEntity<FFStoryHistory> }>('/ffstory-history', {
+                params: {
+                    populate: 'cover,seo'
+                }
+            })
+            return data.data ?? null
+        } catch (error) {
+            console.error('Error fetching FFStory history:', error)
+            return null
+        }
+    }
+
     return {
         fetchChapters,
         fetchChaptersWithDetails,
         fetchArticles,
         fetchArticlesPaged,
         fetchArticleBySlug,
-        getMediaUrl
+        fetchFFStoryHistory,
+        getMediaUrl,
+        getMediaUrlFromArray
     }
 }
