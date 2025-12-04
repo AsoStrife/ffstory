@@ -52,7 +52,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from 'nuxt/app'
-import { useStrapi, type Article, type Chapter, type StrapiEntity } from '../../../composables/useStrapi'
+import { useStrapi, type Article, type Chapter, type StrapiEntity } from '../../composables/useStrapi'
 
 const route = useRoute()
 const { fetchArticles, fetchChapters, getMediaUrl } = useStrapi()
@@ -69,7 +69,7 @@ const coverFor = (article: StrapiEntity<Article>) => {
 }
 
 const articleLink = (article: StrapiEntity<Article>) => {
-    return `/capitolo/${chapterSlug}/${article.attributes.slug}`
+    return `/${chapterSlug}/${article.attributes.slug}`
 }
 
 const formatDate = (dateString: string) => {

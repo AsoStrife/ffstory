@@ -10,7 +10,7 @@
                         <nav class="ff-topnav ff-topnav--attached">
                             <div class="ff-topnav__inner">
                                 <NuxtLink to="/" class="ff-topnav__link">Home</NuxtLink>
-                                <NuxtLink to="/capitoli" class="ff-topnav__link">Tutti i capitoli</NuxtLink>
+                                <NuxtLink to="/final-fantasy" class="ff-topnav__link">Tutti i Final Fantasy</NuxtLink>
                                 <NuxtLink to="/storia-ffstory" class="ff-topnav__link">Storia di FFStory</NuxtLink>
                             </div>
                         </nav>
@@ -95,9 +95,11 @@
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
                                     </NuxtLink>
-                                    <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
-                                        Tutti i capitoli</NuxtLink>
-                                    <NuxtLink to="/storia-ffstory" class="ff-sidebar__link" @click="closeSidebarOnMobile">Storia
+                                    <NuxtLink to="/final-fantasy" class="ff-sidebar__link"
+                                        @click="closeSidebarOnMobile">
+                                        Tutti i Final Fantasy</NuxtLink>
+                                    <NuxtLink to="/storia-ffstory" class="ff-sidebar__link"
+                                        @click="closeSidebarOnMobile">Storia
                                         di FFStory</NuxtLink>
                                 </nav>
                             </section>
@@ -106,7 +108,7 @@
                                 <p class="ff-sidebar__label">Capitoli</p>
                                 <nav class="ff-sidebar__nav">
                                     <NuxtLink v-for="chapter in chapters" :key="chapter.id"
-                                        :to="`/capitolo/${chapter.attributes.slug}`" class="ff-sidebar__link"
+                                        :to="`/${chapter.attributes.slug}`" class="ff-sidebar__link"
                                         @click="closeSidebarOnMobile">
                                         {{ chapter.attributes.title }}
                                     </NuxtLink>
@@ -159,7 +161,7 @@ const latestArticlesList = computed(() => latestArticles.value ?? [])
 
 const articleLink = (article: StrapiEntity<Article>) => {
     const chapterSlug = article.attributes.chapter?.data?.attributes?.slug
-    return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.slug}` : `/capitolo/${article.attributes.slug}`
+    return chapterSlug ? `/${chapterSlug}/${article.attributes.slug}` : `/${article.attributes.slug}`
 }
 
 const coverFor = (article: StrapiEntity<Article>) => {

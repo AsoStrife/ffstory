@@ -8,7 +8,7 @@
                     <p class="section-eyebrow">Final Fantasy Story</p>
                     <h2>Ultimi articoli pubblicati</h2>
                 </div>
-                <NuxtLink to="/capitoli" class="section-link">
+                <NuxtLink to="/final-fantasy" class="section-link">
                     Tutti i capitoli →
                 </NuxtLink>
             </div>
@@ -191,7 +191,7 @@ export default defineComponent({
         // Costruisce il link dell'articolo (dipende dal capitolo associato)
         articleLink(article: StrapiEntity<Article>) {
             const chapterSlug = article.attributes.chapter?.data?.attributes?.slug
-            return chapterSlug ? `/capitolo/${chapterSlug}/${article.attributes.slug}` : `/capitolo/${article.attributes.slug}`
+            return chapterSlug ? `/${chapterSlug}/${article.attributes.slug}` : `/${article.attributes.slug}`
         },
         // Recupera la cover dell'articolo (fallback immagine di default)
         coverFor(article: StrapiEntity<Article>) {

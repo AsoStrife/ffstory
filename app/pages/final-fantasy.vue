@@ -20,7 +20,7 @@
         <template v-else-if="chapters.length">
             <div class="row row-cols-1 row-cols-lg-2 g-4 ff-article-grid">
                 <div v-for="chapter in chapters" :key="chapter.id" class="col">
-                    <NuxtLink class="article-card h-100" :to="`/capitolo/${chapter.attributes.slug}`">
+                    <NuxtLink class="article-card h-100" :to="`/${chapter.attributes.slug}`">
                         <div class="article-card__media">
                             <img :src="coverFor(chapter)" :alt="chapter.attributes.title" class="article-card__image"
                                 loading="lazy" />

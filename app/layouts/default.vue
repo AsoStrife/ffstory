@@ -13,11 +13,11 @@
                             <div class="ff-topnav__inner">
                                 <NuxtLink to="/" class="ff-topnav__link" :class="{ 'ff-topnav__link--active': isHome }">
                                     Home</NuxtLink>
-                                <NuxtLink to="/capitoli" class="ff-topnav__link"
+                                <NuxtLink to="/final-fantasy" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isCapitoli }">Tutti i Final Fantasy</NuxtLink>
                                 <NuxtLink to="/storia-ffstory" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isStoria }">Storia di FFStory</NuxtLink>
-                                <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-topnav__link"
+                                <NuxtLink to="/final-fantasy-x/traduttore-albhed" class="ff-topnav__link"
                                     :class="{ 'ff-topnav__link--active': isTraduttore }">
                                     Traduttore Albhed</NuxtLink>
                             </div>
@@ -53,13 +53,12 @@
                             <nav class="ff-sidebar__nav">
                                 <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
                                 </NuxtLink>
-                                <NuxtLink to="/capitoli" class="ff-sidebar__link" @click="closeSidebarOnMobile">
-                                    Tutti
-                                    i capitoli</NuxtLink>
+                                <NuxtLink to="/final-fantasy" class="ff-sidebar__link" @click="closeSidebarOnMobile">
+                                    Tutti i Final Fantasy</NuxtLink>
                                 <NuxtLink to="/storia-ffstory" class="ff-sidebar__link" @click="closeSidebarOnMobile">
                                     Storia
                                     di FFStory</NuxtLink>
-                                <NuxtLink to="/capitolo/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
+                                <NuxtLink to="/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
                                     @click="closeSidebarOnMobile">Traduttore Al Bhed
                                 </NuxtLink>
                             </nav>
@@ -77,7 +76,7 @@
                             </p>
                             <nav v-show="articlesExpanded" class="ff-sidebar__nav ff-sidebar__nav--sub">
                                 <NuxtLink v-for="article in chapterArticles" :key="article.id"
-                                    :to="`/capitolo/${activeChapterSlug}/${article.attributes.slug}`"
+                                    :to="`/${activeChapterSlug}/${article.attributes.slug}`"
                                     class="ff-sidebar__link ff-sidebar__link--sub"
                                     :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.slug) }"
                                     @click="closeSidebarOnMobile">
@@ -98,7 +97,7 @@
                             <nav v-show="chaptersExpanded" class="ff-sidebar__nav">
                                 <!-- Home link removed as requested -->
                                 <NuxtLink v-for="chapter in chapters" :key="chapter.id"
-                                    :to="`/capitolo/${chapter.attributes.slug}`" class="ff-sidebar__link"
+                                    :to="`/${chapter.attributes.slug}`" class="ff-sidebar__link"
                                     :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.slug) }"
                                     @click="closeSidebarOnMobile">
                                     {{ chapter.attributes.title }}
@@ -137,9 +136,9 @@ const articlesExpanded = ref(true)
 const chaptersExpanded = ref(true)
 
 const isHome = computed(() => route.path === '/')
-const isCapitoli = computed(() => route.path === '/capitoli')
+const isCapitoli = computed(() => route.path === '/final-fantasy')
 const isStoria = computed(() => route.path === '/storia-ffstory')
-const isTraduttore = computed(() => route.path === '/capitolo/final-fantasy-x/traduttore-albhed')
+const isTraduttore = computed(() => route.path === '/final-fantasy-x/traduttore-albhed')
 
 const activeChapterSlug = computed(() => {
     const rawSlug = route.params.slug
@@ -238,11 +237,11 @@ const mainClass = computed(() => {
     // homepage
     if (route.path === '/') return ''
     // pagina tutti i capitoli
-    if (route.path === '/capitoli') return ''
-    // pagina lista articoli capitolo (/capitolo/:slug)
+    if (route.path === '/final-fantasy') return ''
+    // pagina lista articoli capitolo (/:slug)
     if (isChapterRoute.value && !activeArticleSlug.value) return ''
     // pagina traduttore albhed
-    if (route.path === '/capitolo/final-fantasy-x/traduttore-albhed') return ''
+    if (route.path === '/final-fantasy-x/traduttore-albhed') return ''
     return 'ff-main'
 })
 </script>

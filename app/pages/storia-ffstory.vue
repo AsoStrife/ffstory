@@ -210,7 +210,7 @@ const titleSuffix = runtimeConfig.public.siteTitleSuffix as string || '• FFSto
 
 useHead(() => {
     const seo = history.value?.attributes.seo?.[0]
-    
+
     const rawTitle = seo?.metaTitle
         ? seo.metaTitle
         : history.value

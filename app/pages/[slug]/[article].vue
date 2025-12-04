@@ -9,7 +9,7 @@
 
     <div v-else class="article-detail">
         <div class="article-breadcrumb">
-            <NuxtLink :to="`/capitolo/${chapterSlug}`" class="article-breadcrumb__link">← Torna al capitolo</NuxtLink>
+            <NuxtLink :to="`/${chapterSlug}`" class="article-breadcrumb__link">← Torna al capitolo</NuxtLink>
         </div>
 
         <div v-if="coverUrl" class="article-hero">
@@ -54,7 +54,7 @@
         <div class="article-body" v-html="renderedBody"></div>
 
         <div class="article-footer">
-            <NuxtLink :to="`/capitolo/${chapterSlug}`" class="ff-button ff-button--ghost">
+            <NuxtLink :to="`/${chapterSlug}`" class="ff-button ff-button--ghost">
                 ← Torna agli articoli
             </NuxtLink>
         </div>
@@ -65,8 +65,8 @@
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead, useRuntimeConfig } from 'nuxt/app'
-import { useStrapi, type Article, type StrapiEntity } from '../../../composables/useStrapi'
-import { useMarkdown } from '../../../composables/useMarkdown'
+import { useStrapi, type Article, type StrapiEntity } from '../../composables/useStrapi'
+import { useMarkdown } from '../../composables/useMarkdown'
 
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
