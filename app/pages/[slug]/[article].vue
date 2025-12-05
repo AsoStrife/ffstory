@@ -37,9 +37,9 @@
         <!-- Floating TOC Bubble - Teleported to body for proper fixed positioning -->
         <Teleport to="body">
             <div v-if="hasTableOfContents" class="toc-bubble" :class="{ 'toc-bubble--visible': showFloatingToc }">
-                <button class="toc-bubble__toggle" @click="toggleFloatingToc" :aria-expanded="isFloatingTocOpen">
-                    <span class="toc-bubble__icon">☰</span>
-                    <span class="toc-bubble__label">Indice</span>
+                <button class="toc-bubble__toggle" @click="toggleFloatingToc" :aria-expanded="isFloatingTocOpen"
+                    aria-label="Indice dei contenuti">
+                    <img class="toc-bubble__icon" src="/img/moguri-book-reading.png" alt="Moguri" />
                 </button>
                 <div class="toc-bubble__content" v-show="isFloatingTocOpen">
                     <div class="toc-bubble__header">
@@ -425,26 +425,78 @@ useHead(() => {
 :global(.toc-bubble__toggle) {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--ff-primary);
-    color: white;
+    justify-content: center;
+    background: transparent;
     border: none;
-    border-radius: 999px;
-    padding: 0.75rem 1.25rem;
-    font-weight: 600;
-    font-size: 0.9rem;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    padding: 0;
     cursor: pointer;
+    transition: var(--ff-transition);
+    animation: moogle-bounce 2s ease-in-out infinite;
+}
+
+@keyframes moogle-bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(-6px);
+    }
+
+    50% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(-3px);
+    }
+}
+
+:global(.toc-bubble__toggle:hover) {
+    animation: moogle-dance 0.5s ease-in-out infinite;
+}
+
+@keyframes moogle-dance {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1.05);
+    }
+
+    50% {
+        transform: translateY(-8px) scale(1.1);
+    }
+}
+
+:global(.toc-bubble__icon) {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
     box-shadow: 0 4px 20px rgba(52, 81, 178, 0.3);
     transition: var(--ff-transition);
 }
 
-:global(.toc-bubble__toggle:hover) {
-    transform: translateY(-2px);
+:global(.toc-bubble__toggle:hover .toc-bubble__icon) {
     box-shadow: 0 6px 24px rgba(52, 81, 178, 0.4);
 }
 
-:global(.toc-bubble__icon) {
-    font-size: 1rem;
+/* Responsive: smaller on mobile */
+@media (max-width: 768px) {
+    :global(.toc-bubble__toggle) {
+        width: 64px;
+        height: 64px;
+    }
+
+    :global(.toc-bubble__icon) {
+        width: 64px;
+        height: 64px;
+    }
 }
 
 :global(.toc-bubble__content) {
