@@ -452,7 +452,7 @@ useHead(() => {
     bottom: 100%;
     right: 0;
     margin-bottom: 0.75rem;
-    background: var(--ff-surface, #fff);
+    background: #ffffff;
     border: 1px solid var(--ff-border, #dfe3f4);
     border-radius: var(--ff-radius-md, 18px);
     box-shadow: var(--ff-shadow-hover, 0 24px 56px rgba(32, 41, 77, 0.12));
@@ -472,7 +472,7 @@ useHead(() => {
     color: var(--ff-text, #1f2a44);
     position: sticky;
     top: 0;
-    background: var(--ff-surface, #fff);
+    background: #ffffff;
 }
 
 :global(.toc-bubble__close) {

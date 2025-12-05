@@ -1,6 +1,11 @@
 <template>
     <div class="ff-app">
-        <header class="ff-hero">
+        <!-- Menu Mobile (visibile solo su mobile) -->
+        <MobileMenu :chapters="chapters" :chapter-articles="chapterArticles" :active-chapter-slug="activeChapterSlug"
+            :active-chapter-title="activeChapterTitle" :active-article-slug="activeArticleSlug" />
+
+        <!-- Header Desktop (nascosto su mobile) -->
+        <header class="ff-hero desktop-only">
             <div class="container-xl">
                 <div class="row justify-content-center">
                     <div class="col-12">
@@ -27,13 +32,6 @@
             </div>
         </header>
 
-        <button class="mobile-menu-toggle" :class="{ 'mobile-menu-toggle--active': sidebarOpen }" @click="toggleSidebar"
-            aria-label="Apri il menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
         <!-- Top horizontal navigation moved into header to visually connect with hero -->
 
         <div class="container-xl">
@@ -45,28 +43,9 @@
                     </main>
                 </div>
 
-                <div class="col-12 col-lg-4 col-xl-4 col-sidebar" :class="{ 'col-sidebar--open': sidebarOpen }">
-                    <!-- Navigazione primaria (solo mobile) -->
-                    <div class="ff-sidebar mobile-only" :class="{ 'ff-sidebar--open': sidebarOpen }">
-                        <section class="ff-sidebar__section">
-                            <p class="ff-sidebar__label">Navigazione</p>
-                            <nav class="ff-sidebar__nav">
-                                <NuxtLink to="/" class="ff-sidebar__link" @click="closeSidebarOnMobile">Home
-                                </NuxtLink>
-                                <NuxtLink to="/final-fantasy" class="ff-sidebar__link" @click="closeSidebarOnMobile">
-                                    Tutti i Final Fantasy</NuxtLink>
-                                <NuxtLink to="/storia-ffstory" class="ff-sidebar__link" @click="closeSidebarOnMobile">
-                                    Storia
-                                    di FFStory</NuxtLink>
-                                <NuxtLink to="/final-fantasy-x/traduttore-albhed" class="ff-sidebar__link"
-                                    @click="closeSidebarOnMobile">Traduttore Al Bhed
-                                </NuxtLink>
-                            </nav>
-                        </section>
-                    </div>
-
-                    <div v-if="isChapterRoute && chapterArticles.length" class="ff-sidebar"
-                        :class="{ 'ff-sidebar--open': sidebarOpen }">
+                <!-- Sidebar Desktop (nascosta su mobile) -->
+                <div class="col-12 col-lg-4 col-xl-4 col-sidebar desktop-only">
+                    <div v-if="isChapterRoute && chapterArticles.length" class="ff-sidebar">
                         <section class="ff-sidebar__section">
                             <p class="ff-sidebar__label ff-sidebar__label--collapsible"
                                 @click="articlesExpanded = !articlesExpanded">
@@ -78,15 +57,14 @@
                                 <NuxtLink v-for="article in chapterArticles" :key="article.id"
                                     :to="`/${activeChapterSlug}/${article.attributes.slug}`"
                                     class="ff-sidebar__link ff-sidebar__link--sub"
-                                    :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.slug) }"
-                                    @click="closeSidebarOnMobile">
+                                    :class="{ 'ff-sidebar__link--active': isArticleActive(article.attributes.slug) }">
                                     {{ article.attributes.menuTitle || article.attributes.title }}
                                 </NuxtLink>
                             </nav>
                         </section>
                     </div>
 
-                    <div class="ff-sidebar" :class="{ 'ff-sidebar--open': sidebarOpen }">
+                    <div class="ff-sidebar">
                         <section class="ff-sidebar__section">
                             <p class="ff-sidebar__label ff-sidebar__label--collapsible"
                                 @click="chaptersExpanded = !chaptersExpanded">
@@ -98,8 +76,7 @@
                                 <!-- Home link removed as requested -->
                                 <NuxtLink v-for="chapter in chapters" :key="chapter.id"
                                     :to="`/${chapter.attributes.slug}`" class="ff-sidebar__link"
-                                    :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.slug) }"
-                                    @click="closeSidebarOnMobile">
+                                    :class="{ 'ff-sidebar__link--active': isChapterActive(chapter.attributes.slug) }">
                                     {{ chapter.attributes.title }}
                                 </NuxtLink>
                             </nav>
@@ -126,12 +103,11 @@ import { useStrapi, type Article, type StrapiEntity } from '../composables/useSt
 
 const { fetchChapters, fetchArticles } = useStrapi()
 const chapters = ref<any[]>([])
-const sidebarOpen = ref(false)
 const route = useRoute()
 
 const chapterArticles = ref<StrapiEntity<Article>[]>([])
 
-// Stati per le sezioni collassabili
+// Stati per le sezioni collassabili (solo desktop sidebar)
 const articlesExpanded = ref(true)
 const chaptersExpanded = ref(true)
 
@@ -219,16 +195,6 @@ watch(
 onMounted(async () => {
     chapters.value = await fetchChapters()
 })
-
-const toggleSidebar = () => {
-    sidebarOpen.value = !sidebarOpen.value
-}
-
-const closeSidebarOnMobile = () => {
-    if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
-        sidebarOpen.value = false
-    }
-}
 
 const currentYear = new Date().getFullYear()
 

@@ -346,14 +346,13 @@ h2 {
 }
 
 /* Hide hero header on small screens */
-@media (max-width: 767px) {
+@media (max-width: 1024px) {
   .ff-hero {
     display: none;
   }
-  /* ensure topnav remains visible and usable on mobile */
-  .ff-topnav {
-    margin-top: 0.5rem;
-    margin-bottom: 0.75rem;
+  /* hide desktop-only elements on mobile */
+  .desktop-only {
+    display: none !important;
   }
 }
 
@@ -388,18 +387,6 @@ h2 {
   border: 1px solid rgba(255,255,255,0.45);
   backdrop-filter: blur(6px);
   display: inline-block;
-}
-
-/* Make sure topnav remains visible on mobile even if hero is hidden */
-@media (max-width: 767px) {
-  .ff-topnav--attached,
-  .ff-topnav--edge {
-    margin-top: 0.5rem;
-    position: static;
-    padding: 0.5rem 0.5rem;
-    border-radius: var(--ff-radius-sm);
-    background: var(--ff-surface);
-  }
 }
 
 /* Article body: justify text for better reading flow */
@@ -799,36 +786,7 @@ h2 {
   box-shadow: var(--ff-shadow-soft);
 }
 
-/* Mobile menu */
-.mobile-menu-toggle {
-  position: fixed;
-  top: clamp(1rem, 6vw, 2rem);
-  right: clamp(1rem, 6vw, 2rem);
-  z-index: 60;
-  background: var(--ff-primary);
-  color: var(--ff-surface);
-  border: none;
-  border-radius: var(--ff-radius-sm); /* meno rotondo */
-  padding: 0.75rem 0.95rem; /* più grande */
-  display: none;
-  flex-direction: column;
-  gap: 0.4rem;
-  box-shadow: var(--ff-shadow-soft);
-  transition: var(--ff-transition);
-}
-
-.mobile-menu-toggle span {
-  width: 22px;
-  height: 2px;
-  border-radius: 999px;
-  background: currentColor;
-  transition: var(--ff-transition);
-}
-
-.mobile-menu-toggle--active {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: var(--ff-shadow-hover);
-}
+/* Mobile menu - legacy styles removed, now handled by MobileMenu component */
 
 /* Responsive behaviour */
 @media (max-width: 1024px) {
@@ -848,57 +806,9 @@ h2 {
   .ff-shell {
     margin-top: -4.5rem;
   }
-  /* Mobile overlay container: holds stacked sidebars */
-  .col-sidebar {
-    position: fixed;
-    top: clamp(4.5rem, 12vw, 5.5rem);
-    right: clamp(2rem, 8vw, 2.75rem);
-    left: clamp(3rem, 10vw, 3.5rem);
-    z-index: 60;
-    max-width: 360px;
-    margin-left: auto;
-    transform: translateX(120%);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.28s ease, opacity 0.28s ease;
-    will-change: transform, opacity;
-  }
-
-  .col-sidebar--open {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Panel that wraps multiple sidebars and provides scrolling */
-  .col-sidebar {
-    background: var(--ff-surface);
-    border: 1px solid var(--ff-border);
-    border-radius: var(--ff-radius-md);
-    box-shadow: var(--ff-shadow-soft);
-    backdrop-filter: blur(10px);
-    padding: max(clamp(0.75rem, 3vw, 1rem), env(safe-area-inset-left));
-    max-height: calc(100vh - clamp(6rem, 18vw, 8rem));
-    overflow: auto; /* scroll inside overlay instead of overlapping */
-  }
-
-  /* Inside overlay, keep sidebars in normal flow */
-  .col-sidebar .ff-sidebar {
-    position: static;
-    top: auto;
-    transform: none;
-    opacity: 1;
-    pointer-events: auto;
-    max-width: none;
-    margin-left: 0;
-  }
 
   .ff-main {
     padding: clamp(1.75rem, 5vw, 2.5rem);
-  }
-
-  .mobile-menu-toggle {
-    display: flex;
   }
 
   /* Spaziatura extra quando non c'è ff-main (home e indice capitolo) */
@@ -920,7 +830,7 @@ h2 {
   }
 }
 
-/* Mobile-only utility per sezione navigazione primaria nel sidebar */
+/* Legacy mobile-only utility - no longer used, kept for backward compatibility */
 .mobile-only { display: none; }
 @media (max-width: 1024px) { .mobile-only { display: block; } }
 
