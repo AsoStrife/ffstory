@@ -30,9 +30,9 @@
         <!-- Floating TOC Bubble - Teleported to body for proper fixed positioning -->
         <Teleport to="body">
             <div v-if="hasTableOfContents" class="toc-bubble" :class="{ 'toc-bubble--visible': showFloatingToc }">
-                <button class="toc-bubble__toggle" @click="toggleFloatingToc" :aria-expanded="isFloatingTocOpen">
-                    <span class="toc-bubble__icon">☰</span>
-                    <span class="toc-bubble__label">Indice</span>
+                <button class="toc-bubble__toggle" @click="toggleFloatingToc" :aria-expanded="isFloatingTocOpen"
+                    aria-label="Indice dei contenuti">
+                    <img class="toc-bubble__icon" src="/img/moguri-book-reading.png" alt="Moguri" />
                 </button>
                 <div class="toc-bubble__content" v-show="isFloatingTocOpen">
                     <div class="toc-bubble__header">
