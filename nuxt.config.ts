@@ -7,6 +7,9 @@ export default defineNuxtConfig({
     devtools: {
         enabled: false
     },
+    nitro: {
+        preset: 'node-server'
+    },
     runtimeConfig: {
         public: {
             strapiBaseUrl: process.env.NUXT_PUBLIC_STRAPI_BASE_URL,
